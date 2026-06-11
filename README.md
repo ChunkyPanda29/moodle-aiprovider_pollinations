@@ -19,7 +19,6 @@ A Moodle AI provider plugin that integrates [Pollinations.ai](https://pollinatio
 - **Text summarisation** — Summarise content using Pollinations models
 - **OpenAI-compatible API** — Uses the standard `/v1/chat/completions` endpoint
 - **Automatic model discovery** — Models are fetched daily from the Pollinations API
-- **BYOP (Bring Your Own Pollen)** — Optional earn-as-you-go integration with 25% markup
 - **Balance monitoring** — Scheduled task checks pollen balance and alerts admins when low
 - **Rate limiting** — Configurable site-wide rate limits
 
@@ -45,11 +44,7 @@ A Moodle AI provider plugin that integrates [Pollinations.ai](https://pollinatio
 
 ### API Key
 
-Enter your Pollinations secret key (`sk_...`) or publishable key (`pk_...`). Secret keys are recommended for server-side use as they have no rate limits and full access.
-
-### BYOP App Key (Optional)
-
-If you have a Bring Your Own Pollen (BYOP) publishable app key (`pk_...`), enter it to enable earnings. Users pay 25% over base rates and you receive 25% markup. Create an app key at [enter.pollinations.ai](https://enter.pollinations.ai) with `earningsEnabled: true`.
+Enter your Pollinations secret key (`sk_...`) or link your account through the BYOP authorisation process. Secret keys are recommended for server-side use as they have no rate limits and full access.
 
 ### Rate Limiting
 
