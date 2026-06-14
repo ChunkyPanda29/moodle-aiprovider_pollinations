@@ -74,12 +74,32 @@ abstract class abstract_processor extends process_base {
      */
     abstract protected function handle_api_success(ResponseInterface $response): array;
 
+    /**
+     * Get the configured safety header value, if any.
+     *
+     * @return string|null The safety value or null if disabled.
+     */
+    protected function get_safety_header(): ?string {
+        $safety = get_config('aiprovider_pollinations', 'safety');
+        if (!empty($safety) && $safety !== '0') {
+            return $safety;
+        }
+        return null;
+    }
+
     #[\ReturnTypeWillChange]
     protected function query_ai_api(): array {
         $request = $this->create_request_object(
             userid: $this->provider->generate_userid($this->action->get_configuration('userid')),
         );
         $request = $this->provider->add_authentication_headers($request);
+
+        // Add safety header if configured.
+        $safety = $this->get_safety_header();
+        if ($safety !== null) {
+            $request = $request->withAddedHeader('Pollinations-Safe', $safety);
+        }
+
         $client = \core\di::get(http_client::class);
 
         try {

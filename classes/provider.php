@@ -54,6 +54,12 @@ class provider extends \core_ai\provider {
     /** @var int The global rate limit. */
     private int $globalratelimit;
 
+    /** @var bool Is per-user rate limiting for the API enabled. */
+    private bool $enableuserratelimit;
+
+    /** @var int The per-user rate limit. */
+    private int $userratelimit;
+
     /**
      * Class constructor.
      */
@@ -63,6 +69,8 @@ class provider extends \core_ai\provider {
         $this->appkey = !empty($appkey) ? $appkey : self::DEFAULT_APP_KEY;
         $this->enableglobalratelimit = (bool) get_config('aiprovider_pollinations', 'enableglobalratelimit');
         $this->globalratelimit = (int) get_config('aiprovider_pollinations', 'globalratelimit');
+        $this->enableuserratelimit = (bool) get_config('aiprovider_pollinations', 'enableuserratelimit');
+        $this->userratelimit = (int) get_config('aiprovider_pollinations', 'userratelimit');
     }
 
     /**
@@ -83,6 +91,7 @@ class provider extends \core_ai\provider {
         return [
             \core_ai\aiactions\generate_text::class,
             \core_ai\aiactions\summarise_text::class,
+            \core_ai\aiactions\generate_image::class,
         ];
     }
 
@@ -116,6 +125,21 @@ class provider extends \core_ai\provider {
     public function is_request_allowed(aiactions\base $action): array|bool {
         $ratelimiter = \core\di::get(rate_limiter::class);
         $component = \core\component::get_component_from_classname(get_class($this));
+
+        // Check the user rate limit.
+        if ($this->enableuserratelimit) {
+            if (!$ratelimiter->check_user_rate_limit(
+                component: $component,
+                ratelimit: $this->userratelimit,
+                userid: $action->get_configuration('userid'),
+            )) {
+                return [
+                    'success' => false,
+                    'errorcode' => 429,
+                    'errormessage' => 'User rate limit exceeded',
+                ];
+            }
+        }
 
         // Check the global rate limit.
         if ($this->enableglobalratelimit) {
@@ -153,13 +177,13 @@ class provider extends \core_ai\provider {
         $settings = [];
 
         if ($actionname === 'generate_text' || $actionname === 'summarise_text') {
-            // Model selector populated from cached Pollinations models.
+            // Model selector populated from cached Pollinations text models.
             $settings[] = new \admin_setting_configselect(
                 "aiprovider_pollinations/action_{$actionname}_model",
                 new \lang_string("action:{$actionname}:model", 'aiprovider_pollinations'),
                 new \lang_string("action:{$actionname}:model_desc", 'aiprovider_pollinations'),
                 'openai',
-                $this->get_all_models(),
+                $this->get_all_models('text'),
             );
 
             // API endpoint.
@@ -179,6 +203,33 @@ class provider extends \core_ai\provider {
                 $action::get_system_instruction(),
                 PARAM_TEXT,
             );
+        } else if ($actionname === 'generate_image') {
+            // Model selector for image models.
+            $settings[] = new \admin_setting_configselect(
+                "aiprovider_pollinations/action_{$actionname}_model",
+                new \lang_string("action:{$actionname}:model", 'aiprovider_pollinations'),
+                new \lang_string("action:{$actionname}:model_desc", 'aiprovider_pollinations'),
+                'flux',
+                $this->get_all_models('image'),
+            );
+
+            // Image API endpoint (base URL — the processor appends /image/{prompt}).
+            $settings[] = new \admin_setting_configtext(
+                "aiprovider_pollinations/action_{$actionname}_endpoint",
+                new \lang_string("action:{$actionname}:endpoint", 'aiprovider_pollinations'),
+                new \lang_string("action:{$actionname}:endpoint_desc", 'aiprovider_pollinations'),
+                'https://gen.pollinations.ai',
+                PARAM_URL,
+            );
+
+            // Optional seed for reproducible images.
+            $settings[] = new \admin_setting_configtext(
+                "aiprovider_pollinations/action_{$actionname}_seed",
+                new \lang_string("action:{$actionname}:seed", 'aiprovider_pollinations'),
+                new \lang_string("action:{$actionname}:seed_desc", 'aiprovider_pollinations'),
+                '',
+                PARAM_INT,
+            );
         }
 
         return $settings;
@@ -194,15 +245,17 @@ class provider extends \core_ai\provider {
     }
 
     /**
-     * Get list of all Pollinations text models for the admin settings selector.
+     * Get list of Pollinations models for the admin settings selector.
      *
      * Reads from the cached model data stored in plugin config.
      * Falls back to a live API call if no cached data exists.
      *
+     * @param string $type The model type ('text' or 'image').
      * @return array List of models suitable for admin_setting_configselect.
      */
-    private function get_all_models(): array {
-        $cached = get_config('aiprovider_pollinations', 'cached_models');
+    private function get_all_models(string $type = 'text'): array {
+        $cachekey = $type === 'image' ? 'cached_image_models' : 'cached_text_models';
+        $cached = get_config('aiprovider_pollinations', $cachekey);
         if (!empty($cached)) {
             $models = json_decode($cached, true);
             if (is_array($models) && !empty($models)) {
@@ -211,15 +264,32 @@ class provider extends \core_ai\provider {
         }
 
         // Try a live fetch if no cached data.
-        return $this->fetch_models();
+        return $this->fetch_models($type);
     }
 
     /**
      * Fetch the model list from the Pollinations API and cache it.
      *
+     * @param string $type The model type ('text', 'image', or 'all').
      * @return array List of models suitable for admin_setting_configselect.
      */
-    public function fetch_models(): array {
+    public function fetch_models(string $type = 'text'): array {
+        $client = \core\di::get(http_client::class);
+
+        if ($type === 'image') {
+            return $this->fetch_image_models($client);
+        }
+
+        return $this->fetch_text_models($client);
+    }
+
+    /**
+     * Fetch text models from the Pollinations API.
+     *
+     * @param \core\http_client $client HTTP client instance.
+     * @return array List of text models.
+     */
+    private function fetch_text_models(\core\http_client $client): array {
         $request = new Request(
             method: 'GET',
             uri: 'https://gen.pollinations.ai/text/models',
@@ -229,8 +299,6 @@ class provider extends \core_ai\provider {
         if (!empty($this->apikey)) {
             $request = $this->add_authentication_headers($request);
         }
-
-        $client = \core\di::get(http_client::class);
 
         try {
             $response = $client->send($request);
@@ -257,19 +325,77 @@ class provider extends \core_ai\provider {
                 $pollensymbol = '🌸';
                 $costinfo = '';
                 if (!empty($pricing['completionTextTokens'])) {
-                    $costper1k = round((float) $pricing['completionTextTokens'] * 1000000, 2);
-                    $costinfo = " [{$pollensymbol}{$costper1k}/1M tokens]";
+                    $costper1m = round((float) $pricing['completionTextTokens'] * 1000000, 2);
+                    $costinfo = " [{$pollensymbol}{$costper1m}/1M tokens]";
                 }
                 $paidonly = !empty($model['paid_only']) ? ' 💎' : '';
                 $display = "{$title} ({$brand}) — {$inputs} → {$outputs}{$costinfo}{$paidonly}";
                 $selectmodels[$name] = $display;
             }
 
-            // Cache the result for the select dropdown.
-            set_config('cached_models', json_encode($selectmodels), 'aiprovider_pollinations');
-            // Also cache the raw data for balance / info display.
-            set_config('cached_models_raw', json_encode($body), 'aiprovider_pollinations');
-            set_config('models_last_updated', time(), 'aiprovider_pollinations');
+            // Cache the result.
+            set_config('cached_text_models', json_encode($selectmodels), 'aiprovider_pollinations');
+            set_config('cached_text_models_raw', json_encode($body), 'aiprovider_pollinations');
+            set_config('text_models_last_updated', time(), 'aiprovider_pollinations');
+
+            return $selectmodels;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Fetch image models from the Pollinations API.
+     *
+     * @param \core\http_client $client HTTP client instance.
+     * @return array List of image models.
+     */
+    private function fetch_image_models(\core\http_client $client): array {
+        $request = new Request(
+            method: 'GET',
+            uri: 'https://gen.pollinations.ai/image/models',
+        );
+
+        // Model listing does not require authentication, but include it if available.
+        if (!empty($this->apikey)) {
+            $request = $this->add_authentication_headers($request);
+        }
+
+        try {
+            $response = $client->send($request);
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+            $body = json_decode($response->getBody()->getContents(), true);
+            if (!is_array($body)) {
+                return [];
+            }
+
+            $selectmodels = [];
+            foreach ($body as $model) {
+                $name = $model['name'] ?? '';
+                if (empty($name)) {
+                    continue;
+                }
+                $brand = $model['brand'] ?? 'Unknown';
+                $title = $model['title'] ?? $name;
+                $inputs = implode(', ', $model['input_modalities'] ?? ['text']);
+                $pricing = $model['pricing'] ?? [];
+                $pollensymbol = '🌸';
+                $costinfo = '';
+                if (!empty($pricing['completionImageTokens'])) {
+                    $costperimg = round((float) $pricing['completionImageTokens'], 4);
+                    $costinfo = " [{$pollensymbol}{$costperimg}/image]";
+                }
+                $paidonly = !empty($model['paid_only']) ? ' 💎' : '';
+                $display = "{$title} ({$brand}) — {$inputs}{$costinfo}{$paidonly}";
+                $selectmodels[$name] = $display;
+            }
+
+            // Cache the result.
+            set_config('cached_image_models', json_encode($selectmodels), 'aiprovider_pollinations');
+            set_config('cached_image_models_raw', json_encode($body), 'aiprovider_pollinations');
+            set_config('image_models_last_updated', time(), 'aiprovider_pollinations');
 
             return $selectmodels;
         } catch (\Exception $e) {

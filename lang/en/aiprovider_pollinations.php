@@ -47,10 +47,26 @@ $string['byop_error_denied'] = 'Authorization was denied.';
 $string['byop_success'] = 'Successfully connected to Pollinations!';
 
 // Rate limiting.
+$string['ratelimit_heading'] = 'Rate limiting';
 $string['enableglobalratelimit'] = 'Set site-wide rate limit';
 $string['enableglobalratelimit_desc'] = 'Limit the number of requests that the Pollinations API provider can receive across the entire site every hour.';
 $string['globalratelimit'] = 'Maximum number of site-wide requests';
 $string['globalratelimit_desc'] = 'The number of site-wide requests allowed per hour.';
+$string['enableuserratelimit'] = 'Set per-user rate limit';
+$string['enableuserratelimit_desc'] = 'Limit the number of requests that each individual user can make to the Pollinations API provider per hour. Recommended for cost control when using paid pollen balance.';
+$string['userratelimit'] = 'Maximum number of requests per user';
+$string['userratelimit_desc'] = 'The number of requests each user is allowed per hour.';
+
+// Safety settings.
+$string['safety_heading'] = 'Content safety';
+$string['safety'] = 'Safety filter';
+$string['safety_desc'] = 'Pollinations can optionally filter or redact content before processing. See the Pollinations docs for details on each option.';
+$string['safety_off'] = 'Off (no filtering)';
+$string['safety_privacy'] = 'Privacy — redact personal information (names, emails, phone, addresses, IPs, URLs, usernames)';
+$string['safety_secrets'] = 'Secrets — redact API keys, passwords, and tokens';
+$string['safety_privacy_secrets'] = 'Privacy + Secrets — redact both personal info and secrets';
+$string['safety_nsfw'] = 'Block sexual and violent content';
+$string['safety_shield'] = 'Shield — comprehensive content blocking';
 
 // Action: generate_text.
 $string['action:generate_text:endpoint'] = 'API endpoint';
@@ -65,6 +81,14 @@ $string['action:summarise_text:model'] = 'AI model';
 $string['action:summarise_text:model_desc'] = 'The Pollinations text model used to summarise the provided text. Models are fetched automatically from the Pollinations API.';
 $string['action:summarise_text:systeminstruction'] = 'System instruction';
 $string['action:summarise_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
+
+// Action: generate_image.
+$string['action:generate_image:endpoint'] = 'Image API base URL';
+$string['action:generate_image:endpoint_desc'] = 'The base URL for Pollinations image generation. The plugin appends /image/{prompt} automatically.';
+$string['action:generate_image:model'] = 'Image model';
+$string['action:generate_image:model_desc'] = 'The Pollinations image model to use. Models are fetched automatically from the Pollinations API.';
+$string['action:generate_image:seed'] = 'Image seed (optional)';
+$string['action:generate_image:seed_desc'] = 'Set a numeric seed for reproducible image generation. Leave empty for random images each time.';
 
 // Model info section.
 $string['modelinfo_heading'] = 'Model information';
@@ -103,7 +127,7 @@ $string['task_update_models'] = 'Update Pollinations model list';
 $string['task_check_balance'] = 'Check Pollinations pollen balance';
 $string['task_balance_low_subject'] = 'Pollinations AI balance low: {$a} pollen remaining';
 $string['task_balance_low_body'] = 'The Pollinations AI provider pollen balance has dropped to {$a} pollen. Please top up your account at https://pollinations.ai to avoid service disruption.';
-$string['task_models_updated'] = 'Pollinations models updated: {$a->count} models available.';
+$string['task_models_updated'] = 'Pollinations {$a->type} models updated: {$a->count} models available.';
 $string['task_models_update_failed'] = 'Failed to update Pollinations model list: {$a}';
 $string['task_balance_checked'] = 'Pollinations balance checked: {$a} pollen.';
 $string['task_balance_check_failed'] = 'Failed to check Pollinations balance: {$a}';

@@ -37,8 +37,8 @@ $tasks = [
     [
         'classname' => 'aiprovider_pollinations\\task\\check_balance_task',
         'blocking' => 0,
-        'minute' => '30',
-        'hour' => '9',
+        'minute' => '0',
+        'hour' => '*',
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',

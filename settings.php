@@ -88,13 +88,14 @@ if ($hassiteconfig) {
         </script>',
     ));
 
-    // Global rate limiting.
+    // Rate limiting heading.
     $settings->add(new admin_setting_heading(
         'aiprovider_pollinations/ratelimit',
-        new lang_string('settings', 'core'),
+        new lang_string('ratelimit_heading', 'aiprovider_pollinations'),
         '',
     ));
 
+    // Global rate limiting.
     $settings->add(new admin_setting_configcheckbox(
         'aiprovider_pollinations/enableglobalratelimit',
         new lang_string('enableglobalratelimit', 'aiprovider_pollinations'),
@@ -115,6 +116,50 @@ if ($hassiteconfig) {
         'eq',
         0,
     );
+
+    // Per-user rate limiting.
+    $settings->add(new admin_setting_configcheckbox(
+        'aiprovider_pollinations/enableuserratelimit',
+        new lang_string('enableuserratelimit', 'aiprovider_pollinations'),
+        new lang_string('enableuserratelimit_desc', 'aiprovider_pollinations'),
+        0,
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'aiprovider_pollinations/userratelimit',
+        new lang_string('userratelimit', 'aiprovider_pollinations'),
+        new lang_string('userratelimit_desc', 'aiprovider_pollinations'),
+        10,
+        PARAM_INT,
+    ));
+    $settings->hide_if(
+        'aiprovider_pollinations/userratelimit',
+        'aiprovider_pollinations/enableuserratelimit',
+        'eq',
+        0,
+    );
+
+    // Safety settings heading.
+    $settings->add(new admin_setting_heading(
+        'aiprovider_pollinations/safety',
+        new lang_string('safety_heading', 'aiprovider_pollinations'),
+        '',
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'aiprovider_pollinations/safety',
+        new lang_string('safety', 'aiprovider_pollinations'),
+        new lang_string('safety_desc', 'aiprovider_pollinations'),
+        '0',
+        [
+            '0' => get_string('safety_off', 'aiprovider_pollinations'),
+            'privacy' => get_string('safety_privacy', 'aiprovider_pollinations'),
+            'secrets' => get_string('safety_secrets', 'aiprovider_pollinations'),
+            'privacy,secrets' => get_string('safety_privacy_secrets', 'aiprovider_pollinations'),
+            'sexual,violence' => get_string('safety_nsfw', 'aiprovider_pollinations'),
+            'shield' => get_string('safety_shield', 'aiprovider_pollinations'),
+        ],
+    ));
 
     // Account & balance section.
     $settings->add(new admin_setting_heading(

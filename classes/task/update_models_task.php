@@ -17,7 +17,10 @@
 namespace aiprovider_pollinations\task;
 
 /**
- * Scheduled task to update the cached Pollinations model list.
+ * Scheduled task to update the cached Pollinations model lists.
+ *
+ * Fetches both text and image model lists daily to keep the
+ * admin settings selectors current.
  *
  * @package    aiprovider_pollinations
  * @copyright  2026 Krissy Painter
@@ -44,14 +47,26 @@ class update_models_task extends \core\task\scheduled_task {
             return;
         }
 
-        $models = $provider->fetch_models();
-
-        if (empty($models)) {
-            mtrace(get_string('task_models_update_failed', 'aiprovider_pollinations', 'empty response'));
-            return;
+        // Fetch text models.
+        $textmodels = $provider->fetch_models('text');
+        if (empty($textmodels)) {
+            mtrace(get_string('task_models_update_failed', 'aiprovider_pollinations', 'text models: empty response'));
+        } else {
+            mtrace(get_string('task_models_updated', 'aiprovider_pollinations', (object)[
+                'count' => count($textmodels),
+                'type' => 'text',
+            ]));
         }
 
-        $count = count($models);
-        mtrace(get_string('task_models_updated', 'aiprovider_pollinations', (object)['count' => $count]));
+        // Fetch image models.
+        $imagemodels = $provider->fetch_models('image');
+        if (empty($imagemodels)) {
+            mtrace(get_string('task_models_update_failed', 'aiprovider_pollinations', 'image models: empty response'));
+        } else {
+            mtrace(get_string('task_models_updated', 'aiprovider_pollinations', (object)[
+                'count' => count($imagemodels),
+                'type' => 'image',
+            ]));
+        }
     }
 }
