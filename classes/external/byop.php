@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ class byop extends external_api {
     /**
      * The BYOP publishable app key.
      */
-    const APP_KEY = 'pk_Jpc…Hqe6';
+    const APP_KEY = 'pk_JpcODXmxY8ORHqe6';
 
     /**
      * Initiate the BYOP device authorisation flow.
@@ -69,7 +69,7 @@ class byop extends external_api {
         $client = \core\di::get(http_client::class);
 
         try {
-            $response = $client->send($request);
+            $response = $client->send($request, ['http_errors' => false]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             if (!is_array($body) || !isset($body['device_code'])) {
@@ -145,7 +145,7 @@ class byop extends external_api {
         $client = \core\di::get(http_client::class);
 
         try {
-            $response = $client->send($request);
+            $response = $client->send($request, ['http_errors' => false]);
             $status = $response->getStatusCode();
             $body = json_decode($response->getBody()->getContents(), true);
 
