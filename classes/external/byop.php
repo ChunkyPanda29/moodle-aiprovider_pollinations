@@ -34,7 +34,8 @@ use GuzzleHttp\Psr7\Request;
  * @copyright  2026 Krissy Painter
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class byop extends external_api {\n    /**
+class byop extends external_api {
+    /**
      * Returns the BYOP publishable app key, checking for an override in config.
      *
      * @return string
