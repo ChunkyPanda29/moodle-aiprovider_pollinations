@@ -27,16 +27,31 @@ use Psr\Http\Message\UriInterface;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class process_summarise_text extends process_generate_text {
+    /**
+     * Get the endpoint for the text summarisation API.
+     *
+     * @return UriInterface
+     */
     #[\ReturnTypeWillChange]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_summarise_text_endpoint'));
     }
 
+    /**
+     * Get the model to use for text summarisation.
+     *
+     * @return string
+     */
     #[\ReturnTypeWillChange]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_summarise_text_model');
     }
 
+    /**
+     * Get the system instruction for text summarisation.
+     *
+     * @return string
+     */
     #[\ReturnTypeWillChange]
     protected function get_system_instruction(): string {
         return get_config('aiprovider_pollinations', 'action_summarise_text_systeminstruction');

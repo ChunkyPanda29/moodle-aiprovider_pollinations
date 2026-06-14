@@ -121,6 +121,12 @@ class provider extends \core_ai\provider {
             ->withAddedHeader('Authorization', 'Bearer ' . $this->apikey);
     }
 
+    /**
+     * Check whether a request is allowed based on rate limits.
+     *
+     * @param aiactions\base $action The action to check.
+     * @return array|bool True if allowed, otherwise an array with error details.
+     */
     #[\ReturnTypeWillChange]
     public function is_request_allowed(aiactions\base $action): array|bool {
         $ratelimiter = \core\di::get(rate_limiter::class);

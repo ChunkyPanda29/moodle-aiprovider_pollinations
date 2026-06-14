@@ -30,21 +30,42 @@ use Psr\Http\Message\UriInterface;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class process_generate_text extends abstract_processor {
+    /**
+     * Get the endpoint for the text generation API.
+     *
+     * @return UriInterface
+     */
     #[\ReturnTypeWillChange]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_generate_text_endpoint'));
     }
 
+    /**
+     * Get the model to use for text generation.
+     *
+     * @return string
+     */
     #[\ReturnTypeWillChange]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_generate_text_model');
     }
 
+    /**
+     * Get the system instruction for text generation.
+     *
+     * @return string
+     */
     #[\ReturnTypeWillChange]
     protected function get_system_instruction(): string {
         return get_config('aiprovider_pollinations', 'action_generate_text_systeminstruction');
     }
 
+    /**
+     * Create the request object for the Pollinations text generation API.
+     *
+     * @param string $userid The user id.
+     * @return RequestInterface
+     */
     #[\ReturnTypeWillChange]
     protected function create_request_object(string $userid): RequestInterface {
         /*

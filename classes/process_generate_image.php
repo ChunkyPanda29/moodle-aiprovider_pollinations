@@ -40,11 +40,21 @@ class process_generate_image extends abstract_processor {
     /** @var int The number of images to generate. */
     private int $numberimages = 1;
 
+    /**
+     * Get the endpoint for the image generation API.
+     *
+     * @return UriInterface
+     */
     #[\ReturnTypeWillChange]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_generate_image_endpoint'));
     }
 
+    /**
+     * Get the model to use for image generation.
+     *
+     * @return string
+     */
     #[\ReturnTypeWillChange]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_generate_image_model');
