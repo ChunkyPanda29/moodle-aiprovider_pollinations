@@ -14,305 +14,258 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * AMD module for BYOP device flow connection UI.
+ * BYOP Connect module — Pollinations Redirect Flow.
  *
- * @package    aiprovider_pollinations
+ * Opens a popup window to enter.pollinations.ai/authorize.
+ * After the user authorizes, Pollinations redirects back to Moodle
+ * with the API key in the URL fragment (#api_key=sk_...).
+ * This module detects the redirect, saves the key, and closes the popup.
+ *
+ * @module     aiprovider_pollinations/byop_connect
  * @copyright  2026 Krissy Painter
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/str', 'core/notification'], function(Ajax, Str, Notification) {
+import Ajax from 'core/ajax';
+import {get_string as getString} from 'core/str';
+import Notification from 'core/notification';
 
-    /** @var {number|null} Polling interval ID. */
-    var pollInterval = null;
+// Pollinations BYOP configuration.
+const AUTHORIZE_URL = 'https://enter.pollinations.ai/authorize';
+const APP_KEY = 'pk_JpcODXmxY8ORHqe6';
 
-    /**
-     * Call a Moodle external function via AJAX.
-     *
-     * @param {string} method The external function name.
-     * @param {Object} [args] Arguments to pass.
-     * @return {Promise}
-     */
-    function callExternal(method, args) {
-        var request = {
-            methodname: method,
-            args: args || {}
-        };
-        return Ajax.call([request])[0];
+/**
+ * Initialise the BYOP connect UI.
+ */
+export const init = () => {
+    const container = document.getElementById('aiprovider_pollinations_byop_container');
+    if (!container) {
+        return;
     }
 
-    /**
-     * Load the required language strings.
-     *
-     * @return {Promise<Object>}
-     */
-    function loadStrings() {
-        return Str.get_strings([
-            {key: 'byop_connect', component: 'aiprovider_pollinations'},
-            {key: 'byop_connect_desc', component: 'aiprovider_pollinations'},
-            {key: 'byop_connected', component: 'aiprovider_pollinations'},
-            {key: 'byop_disconnected', component: 'aiprovider_pollinations'},
-            {key: 'byop_disconnect', component: 'aiprovider_pollinations'},
-            {key: 'byop_code_instructions', component: 'aiprovider_pollinations'},
-            {key: 'byop_polling', component: 'aiprovider_pollinations'},
-            {key: 'byop_balance', component: 'aiprovider_pollinations'},
-            {key: 'byop_error_init', component: 'aiprovider_pollinations'},
-            {key: 'byop_error_poll', component: 'aiprovider_pollinations'},
-            {key: 'byop_error_denied', component: 'aiprovider_pollinations'},
-            {key: 'byop_success', component: 'aiprovider_pollinations'}
-        ]).then(function(strings) {
-            return {
-                connect: strings[0],
-                connectDesc: strings[1],
-                connected: strings[2],
-                disconnected: strings[3],
-                disconnect: strings[4],
-                codeInstructions: strings[5],
-                polling: strings[6],
-                balance: strings[7],
-                errorInit: strings[8],
-                errorPoll: strings[9],
-                errorDenied: strings[10],
-                success: strings[11]
-            };
+    // Build the UI.
+    container.innerHTML = '';
+    container.style.padding = '10px 0';
+
+    // Status display.
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'aiprovider_pollinations_status';
+    statusDiv.style.marginBottom = '10px';
+    container.appendChild(statusDiv);
+
+    // Connect button.
+    const connectBtn = document.createElement('button');
+    connectBtn.type = 'button';
+    connectBtn.className = 'btn btn-primary';
+    connectBtn.textContent = '🔗 Connect to Pollinations';
+    connectBtn.style.marginRight = '8px';
+    connectBtn.addEventListener('click', startRedirectFlow);
+    container.appendChild(connectBtn);
+
+    // Disconnect button.
+    const disconnectBtn = document.createElement('button');
+    disconnectBtn.type = 'button';
+    disconnectBtn.className = 'btn btn-secondary';
+    disconnectBtn.textContent = 'Disconnect';
+    disconnectBtn.style.display = 'none';
+    disconnectBtn.addEventListener('click', disconnect);
+    container.appendChild(disconnectBtn);
+
+    // Check initial status.
+    checkStatus();
+};
+
+/**
+ * Start the BYOP redirect flow in a popup window.
+ */
+const startRedirectFlow = async() => {
+    // Generate CSRF state token.
+    const state = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem('pollinations_byop_state', state);
+
+    // Build the authorize URL.
+    // redirect_uri points back to this admin page — Pollinations will redirect
+    // the popup back here with #api_key=sk_...&state=...
+    const params = new URLSearchParams({
+        redirect_uri: window.location.href.split('#')[0],
+        client_id: APP_KEY,
+        state: state,
+    });
+
+    const authUrl = `${AUTHORIZE_URL}?${params.toString()}`;
+
+    // Open popup.
+    const popup = window.open(authUrl, 'pollinations_auth', 'width=600,height=700,scrollbars=yes');
+
+    if (!popup) {
+        Notification.addNotification({
+            message: 'Popup blocked. Please allow popups for this page and try again.',
+            type: 'error',
         });
+        return;
     }
 
-    /**
-     * Render the connected state.
-     *
-     * @param {Object} strings Language strings.
-     * @param {Object} status Status response from get_status.
-     */
-    function renderConnected(strings, status) {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        if (!container) {
-            return;
-        }
+    // Poll the popup to detect when it redirects back to our origin.
+    const pollTimer = setInterval(() => {
+        try {
+            if (popup.closed) {
+                clearInterval(pollTimer);
+                // Popup was closed without completing — check if we got connected.
+                checkStatus();
+                return;
+            }
 
-        var username = status.username || '';
-        var balanceText = status.balance ? strings.balance.replace('{$a}', status.balance) : '';
+            // Try to read popup URL (only works when same-origin after redirect).
+            if (popup.location.hostname === window.location.hostname) {
+                const hash = popup.location.hash;
+                const hashParams = new URLSearchParams(hash.slice(1));
+                const apiKey = hashParams.get('api_key');
+                const error = hashParams.get('error');
+                const returnedState = hashParams.get('state');
 
-        var html = '<div class="alert alert-success">';
-        html += '<p><strong>' + strings.connected.replace('{$a}', username) + '</strong></p>';
-        if (balanceText) {
-            html += '<p>' + balanceText + '</p>';
-        }
-        html += '<button type="button" class="btn btn-secondary" id="aiprovider_pollinations_disconnect_btn">';
-        html += strings.disconnect;
-        html += '</button>';
-        html += '</div>';
-
-        container.innerHTML = html;
-
-        document.getElementById('aiprovider_pollinations_disconnect_btn').addEventListener('click', function() {
-            handleDisconnect();
-        });
-    }
-
-    /**
-     * Render the disconnected state.
-     *
-     * @param {Object} strings Language strings.
-     */
-    function renderDisconnected(strings) {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        if (!container) {
-            return;
-        }
-
-        var html = '<div class="alert alert-info">';
-        html += '<p>' + strings.disconnected + '</p>';
-        html += '<p><small>' + strings.connectDesc + '</small></p>';
-        html += '<button type="button" class="btn btn-primary" id="aiprovider_pollinations_connect_btn">';
-        html += strings.connect;
-        html += '</button>';
-        html += '</div>';
-
-        container.innerHTML = html;
-
-        document.getElementById('aiprovider_pollinations_connect_btn').addEventListener('click', function() {
-            handleConnect(strings);
-        });
-    }
-
-    /**
-     * Render the waiting-for-authorisation state.
-     *
-     * @param {Object} strings Language strings.
-     * @param {string} userCode The user code to display.
-     * @param {string} verificationUrl The URL to visit.
-     */
-    function renderWaiting(strings, userCode, verificationUrl) {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        if (!container) {
-            return;
-        }
-
-        var instructions = strings.codeInstructions
-            .replace('{$a->url}', verificationUrl)
-            .replace('{$a->code}', userCode);
-
-        var html = '<div class="alert alert-warning">';
-        html += '<p><strong>' + instructions + '</strong></p>';
-        html += '<p class="text-muted"><em>' + strings.polling + '</em></p>';
-        html += '</div>';
-
-        container.innerHTML = html;
-    }
-
-    /**
-     * Render an error state.
-     *
-     * @param {string} message Error message.
-     */
-    function renderError(message) {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        if (!container) {
-            return;
-        }
-
-        container.innerHTML = '<div class="alert alert-danger"><p>' + message + '</p></div>';
-
-        // Show reconnect button after a moment.
-        loadStrings().then(function(strings) {
-            setTimeout(function() {
-                var btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'btn btn-primary mt-2';
-                btn.textContent = strings.connect;
-                btn.addEventListener('click', function() {
-                    handleConnect(strings);
-                });
-                container.querySelector('.alert').appendChild(btn);
-            }, 1000);
-        });
-    }
-
-    /**
-     * Handle the connect button click.
-     *
-     * @param {Object} strings Language strings.
-     */
-    function handleConnect(strings) {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        container.innerHTML = '<div class="alert alert-info"><p>Starting authorisation...</p></div>';
-
-        callExternal('aiprovider_pollinations_init_device_flow')
-            .then(function(response) {
-                if (!response.success) {
-                    renderError(response.error || strings.errorInit);
+                if (error) {
+                    clearInterval(pollTimer);
+                    popup.close();
+                    showStatus('❌ Authorization denied.', 'error');
                     return;
                 }
-                renderWaiting(strings, response.user_code, response.verification_url);
-                startPolling(strings);
-            })
-            .catch(function(error) {
-                Notification.exception(error);
-                renderError(strings.errorInit);
-            });
-    }
 
-    /**
-     * Start polling for the device token.
-     *
-     * @param {Object} strings Language strings.
-     */
-    function startPolling(strings) {
-        if (pollInterval) {
-            clearInterval(pollInterval);
-        }
+                if (apiKey) {
+                    clearInterval(pollTimer);
 
-        pollInterval = setInterval(function() {
-            callExternal('aiprovider_pollinations_poll_device_token')
-                .then(function(response) {
-                    if (response.success && response.status === 'authorised') {
-                        clearInterval(pollInterval);
-                        pollInterval = null;
-                        renderConnected(strings, {username: '', balance: ''});
-                        // Fetch full status to get username + balance.
-                        refreshStatus(strings);
-                    } else if (response.status === 'denied') {
-                        clearInterval(pollInterval);
-                        pollInterval = null;
-                        renderError(response.error || strings.errorDenied);
-                    } else if (response.status === 'expired' || response.status === 'error') {
-                        clearInterval(pollInterval);
-                        pollInterval = null;
-                        renderError(response.error || strings.errorPoll);
+                    // Verify state for CSRF protection.
+                    const savedState = sessionStorage.getItem('pollinations_byop_state');
+                    if (returnedState && savedState && returnedState !== savedState) {
+                        popup.close();
+                        showStatus('❌ Security check failed. Please try again.', 'error');
+                        return;
                     }
-                    // 'pending' — keep polling.
-                })
-                .catch(function(error) {
-                    clearInterval(pollInterval);
-                    pollInterval = null;
-                    Notification.exception(error);
-                    renderError(strings.errorPoll);
-                });
-        }, 5000);
-    }
 
-    /**
-     * Refresh the connection status from the server.
-     *
-     * @param {Object} strings Language strings.
-     */
-    function refreshStatus(strings) {
-        callExternal('aiprovider_pollinations_get_status')
-            .then(function(status) {
-                if (status.connected) {
-                    renderConnected(strings, status);
-                } else {
-                    renderDisconnected(strings);
+                    // Save the key via AJAX.
+                    saveKey(apiKey).then(() => {
+                        popup.close();
+                        sessionStorage.removeItem('pollinations_byop_state');
+                        showStatus('✅ Successfully connected to Pollinations!', 'success');
+                        toggleButtons(true);
+                    }).catch(Notification.exception);
                 }
-            })
-            .catch(function(error) {
-                Notification.exception(error);
-            });
-    }
-
-    /**
-     * Handle the disconnect button click.
-     */
-    function handleDisconnect() {
-        callExternal('aiprovider_pollinations_disconnect')
-            .then(function() {
-                loadStrings().then(function(strings) {
-                    renderDisconnected(strings);
-                });
-            })
-            .catch(function(error) {
-                Notification.exception(error);
-            });
-    }
-
-    /**
-     * Initialise the BYOP connection UI.
-     */
-    function init() {
-        var container = document.getElementById('aiprovider_pollinations_byop_container');
-        if (!container) {
-            return;
+            }
+        } catch (e) {
+            // Cross-origin — popup is still on Pollinations domain, keep waiting.
         }
+    }, 500); // Check every 500ms.
 
-        loadStrings().then(function(strings) {
-            // Check current status.
-            callExternal('aiprovider_pollinations_get_status')
-                .then(function(status) {
-                    if (status.connected) {
-                        renderConnected(strings, status);
-                    } else {
-                        renderDisconnected(strings);
-                    }
-                })
-                .catch(function(error) {
-                    Notification.exception(error);
-                    renderDisconnected(strings);
-                });
-        });
-    }
+    // Timeout after 5 minutes.
+    setTimeout(() => {
+        if (!popup.closed) {
+            clearInterval(pollTimer);
+            popup.close();
+            showStatus('⏰ Authorization timed out. Please try again.', 'error');
+        }
+    }, 300000);
+};
 
-    return {
-        init: init
+/**
+ * Save the API key via the external API.
+ *
+ * @param {string} apikey
+ * @return {Promise}
+ */
+const saveKey = (apikey) => {
+    const request = {
+        methodname: 'aiprovider_pollinations_save_key',
+        args: {apikey: apikey},
     };
-});
+    return Ajax.call([request])[0];
+};
+
+/**
+ * Disconnect by clearing the stored API key.
+ */
+const disconnect = async() => {
+    const request = {
+        methodname: 'aiprovider_pollinations_disconnect',
+        args: {},
+    };
+    try {
+        await Ajax.call([request])[0];
+        showStatus('Disconnected from Pollinations.', 'info');
+        toggleButtons(false);
+    } catch (e) {
+        Notification.exception(e);
+    }
+};
+
+/**
+ * Check current connection status and update UI.
+ */
+const checkStatus = async() => {
+    const request = {
+        methodname: 'aiprovider_pollinations_get_status',
+        args: {},
+    };
+    try {
+        const result = await Ajax.call([request])[0];
+        if (result.connected) {
+            let msg = '✅ Connected to Pollinations';
+            if (result.balance !== undefined && result.balance !== null) {
+                msg += ` — Balance: ${result.balance} pollen`;
+            }
+            showStatus(msg, 'success');
+            toggleButtons(true);
+        } else {
+            showStatus('⚪ Not connected. Click "Connect to Pollinations" to get started.', 'info');
+            toggleButtons(false);
+        }
+    } catch (e) {
+        // Silently fail — external API may not be available during install.
+        showStatus('⚪ Not connected. Click "Connect to Pollinations" to get started.', 'info');
+    }
+};
+
+/**
+ * Show a status message.
+ *
+ * @param {string} message
+ * @param {string} type 'success', 'error', or 'info'
+ */
+const showStatus = (message, type) => {
+    const statusDiv = document.getElementById('aiprovider_pollinations_status');
+    if (!statusDiv) {
+        return;
+    }
+    statusDiv.textContent = message;
+    statusDiv.style.padding = '8px 12px';
+    statusDiv.style.borderRadius = '6px';
+    statusDiv.style.marginBottom = '10px';
+
+    switch (type) {
+        case 'success':
+            statusDiv.style.backgroundColor = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.style.border = '1px solid #c3e6cb';
+            break;
+        case 'error':
+            statusDiv.style.backgroundColor = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.style.border = '1px solid #f5c6cb';
+            break;
+        default:
+            statusDiv.style.backgroundColor = '#e2e3e5';
+            statusDiv.style.color = '#383d41';
+            statusDiv.style.border = '1px solid #d6d8db';
+    }
+};
+
+/**
+ * Toggle connect/disconnect button visibility.
+ *
+ * @param {bool} connected
+ */
+const toggleButtons = (connected) => {
+    const buttons = document.querySelectorAll('#aiprovider_pollinations_byop_container button');
+    if (buttons.length >= 2) {
+        buttons[0].style.display = connected ? 'none' : 'inline-block'; // Connect.
+        buttons[1].style.display = connected ? 'inline-block' : 'none'; // Disconnect.
+    }
+};

@@ -29,20 +29,11 @@ $string['pluginname'] = 'Pollinations AI provider';
 $string['apikey'] = 'Pollinations API key';
 $string['apikey_desc'] = 'Your Pollinations secret key (sk_...). This is set automatically via the Connect to Pollinations flow above, but can also be entered manually for testing.';
 
-// BYOP device flow.
-$string['byop_balance'] = 'Balance: {$a} pollen';
-$string['byop_code_instructions'] = 'Go to {$a->url} and enter code: {$a->code}';
+// BYOP connection.
 $string['byop_connect'] = 'Connect to Pollinations';
-$string['byop_connect_desc'] = 'Click to authorize your Moodle site with Pollinations. You will need a Pollinations account.';
 $string['byop_connected'] = 'Connected as {$a}';
-$string['byop_disconnect'] = 'Disconnect';
 $string['byop_disconnected'] = 'Not connected';
-$string['byop_error_denied'] = 'Authorization was denied.';
-$string['byop_error_init'] = 'Failed to start authorization. Please try again.';
-$string['byop_error_poll'] = 'Authorization check failed. Please try again.';
 $string['byop_heading'] = 'Pollinations Connection';
-$string['byop_polling'] = 'Waiting for authorization...';
-$string['byop_success'] = 'Successfully connected to Pollinations!';
 
 // Rate limiting.
 $string['enableglobalratelimit'] = 'Set site-wide rate limit';

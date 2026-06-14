@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External function definitions for BYOP device flow.
+ * External function definitions for BYOP redirect flow.
  *
  * @package    aiprovider_pollinations
  * @copyright  2026 Krissy Painter
@@ -25,20 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'aiprovider_pollinations_init_device_flow' => [
+    'aiprovider_pollinations_save_key' => [
         'classname' => 'aiprovider_pollinations\\external\\byop',
-        'methodname' => 'init_device_flow',
+        'methodname' => 'save_key',
         'classpath' => '',
-        'description' => 'Initiate a BYOP device authorisation flow',
-        'type' => 'write',
-        'ajax' => true,
-        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'aiprovider_pollinations_poll_device_token' => [
-        'classname' => 'aiprovider_pollinations\\external\\byop',
-        'methodname' => 'poll_device_token',
-        'classpath' => '',
-        'description' => 'Poll for the BYOP device authorisation token',
+        'description' => 'Save the Pollinations API key from BYOP redirect flow',
         'type' => 'write',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
