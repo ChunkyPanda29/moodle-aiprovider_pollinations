@@ -27,6 +27,8 @@ use core_ai\admin\admin_settingspage_provider;
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
+    global $PAGE;
+
     $settings = new admin_settingspage_provider(
         'aiprovider_pollinations',
         new lang_string('pluginname', 'aiprovider_pollinations'),
@@ -34,35 +36,11 @@ if ($hassiteconfig) {
         true,
     );
 
-    // General settings heading.
-    $settings->add(new admin_setting_heading(
-        'aiprovider_pollinations/general',
-        new lang_string('settings', 'core'),
-        '',
-    ));
-
     // BYOP connection heading.
     $settings->add(new admin_setting_heading(
         'aiprovider_pollinations/byop_heading',
         new lang_string('byop_heading', 'aiprovider_pollinations'),
         '',
-    ));
-
-    // Manual API key fallback (hidden by default, still usable for developers/testing).
-    $settings->add(new admin_setting_configpasswordunmask(
-        'aiprovider_pollinations/apikey',
-        new lang_string('apikey', 'aiprovider_pollinations'),
-        new lang_string('apikey_desc', 'aiprovider_pollinations'),
-        '',
-    ));
-
-    // BYOP app key override (optional — defaults to hardcoded value).
-    $settings->add(new admin_setting_configtext(
-        'aiprovider_pollinations/appkey',
-        new lang_string('appkey', 'aiprovider_pollinations'),
-        new lang_string('appkey_desc', 'aiprovider_pollinations'),
-        '',
-        PARAM_ALPHANUMEXT,
     ));
 
     // BYOP connect UI placeholder — the AMD module targets this container.
@@ -77,16 +55,16 @@ if ($hassiteconfig) {
         $byopplaceholder,
     ));
 
-    // Load the BYOP AMD module.
-    $settings->add(new admin_setting_description(
-        'aiprovider_pollinations/byop_amd_loader',
+    // API key (set automatically by BYOP flow, not directly editable by users).
+    $settings->add(new admin_setting_configpasswordunmask(
+        'aiprovider_pollinations/apikey',
+        new lang_string('apikey', 'aiprovider_pollinations'),
+        new lang_string('apikey_desc', 'aiprovider_pollinations'),
         '',
-        '<script>
-        require(["aiprovider_pollinations/byop_connect"], function(module) {
-            module.init();
-        });
-        </script>',
     ));
+
+    // Load the BYOP AMD module properly via Moodle's page requirements.
+    $PAGE->requires->js_call_amd('aiprovider_pollinations/byop_connect', 'init');
 
     // Rate limiting heading.
     $settings->add(new admin_setting_heading(
@@ -146,19 +124,11 @@ if ($hassiteconfig) {
         '',
     ));
 
-    $settings->add(new admin_setting_configselect(
-        'aiprovider_pollinations/safety',
-        new lang_string('safety', 'aiprovider_pollinations'),
-        new lang_string('safety_desc', 'aiprovider_pollinations'),
-        '0',
-        [
-            '0' => get_string('safety_off', 'aiprovider_pollinations'),
-            'privacy' => get_string('safety_privacy', 'aiprovider_pollinations'),
-            'secrets' => get_string('safety_secrets', 'aiprovider_pollinations'),
-            'privacy,secrets' => get_string('safety_privacy_secrets', 'aiprovider_pollinations'),
-            'sexual,violence' => get_string('safety_nsfw', 'aiprovider_pollinations'),
-            'shield' => get_string('safety_shield', 'aiprovider_pollinations'),
-        ],
+    $settings->add(new admin_setting_configcheckbox(
+        'aiprovider_pollinations/enablesafety',
+        new lang_string('enablesafety', 'aiprovider_pollinations'),
+        new lang_string('enablesafety_desc', 'aiprovider_pollinations'),
+        1,
     ));
 
     // Account & balance section.

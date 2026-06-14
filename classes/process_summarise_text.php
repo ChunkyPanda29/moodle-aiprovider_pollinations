@@ -34,7 +34,7 @@ class process_summarise_text extends process_generate_text {
      */
     #[\Override]
     protected function get_endpoint(): UriInterface {
-        return new Uri(get_config('aiprovider_pollinations', 'action_summarise_text_endpoint'));
+        return new Uri(provider::TEXT_API_ENDPOINT);
     }
 
     /**

@@ -37,7 +37,7 @@ class process_generate_text extends abstract_processor {
      */
     #[\Override]
     protected function get_endpoint(): UriInterface {
-        return new Uri(get_config('aiprovider_pollinations', 'action_generate_text_endpoint'));
+        return new Uri(provider::TEXT_API_ENDPOINT);
     }
 
     /**

@@ -28,8 +28,6 @@ $string['pluginname'] = 'Pollinations AI provider';
 // API settings.
 $string['apikey'] = 'Pollinations API key';
 $string['apikey_desc'] = 'Your Pollinations secret key (sk_...). This is set automatically via the Connect to Pollinations flow above, but can also be entered manually for testing.';
-$string['appkey'] = 'BYOP app key override (optional)';
-$string['appkey_desc'] = 'Leave empty to use the default BYOP app key. Override only if you have your own Pollinations developer app key (pk_...).';
 
 // BYOP device flow.
 $string['byop_balance'] = 'Balance: {$a} pollen';
@@ -58,37 +56,27 @@ $string['userratelimit'] = 'Maximum number of requests per user';
 $string['userratelimit_desc'] = 'The number of requests each user is allowed per hour.';
 
 // Safety settings.
-$string['safety'] = 'Safety filter';
-$string['safety_desc'] = 'Pollinations can optionally filter or redact content before processing. See the Pollinations docs for details on each option.';
+$string['enablesafety'] = 'Enable content safety filtering';
+$string['enablesafety_desc'] = 'When enabled, personal information (names, emails, phone numbers, addresses, IPs) and secrets (API keys, passwords, tokens) are automatically redacted before being sent to the AI model.';
 $string['safety_heading'] = 'Content safety';
-$string['safety_nsfw'] = 'Block sexual and violent content';
-$string['safety_off'] = 'Off (no filtering)';
-$string['safety_privacy'] = 'Privacy — redact personal information (names, emails, phone, addresses, IPs, URLs, usernames)';
-$string['safety_privacy_secrets'] = 'Privacy + Secrets — redact both personal info and secrets';
-$string['safety_secrets'] = 'Secrets — redact API keys, passwords, and tokens';
-$string['safety_shield'] = 'Shield — comprehensive content blocking';
+
+// Action: generate_image.
+$string['action:generate_image:model'] = 'Image model';
+$string['action:generate_image:model_desc'] = 'The Pollinations image model to use. Models are fetched automatically from the Pollinations API.';
+$string['action:generate_image:seed'] = 'Image seed (optional)';
+$string['action:generate_image:seed_desc'] = 'Set a numeric seed for reproducible image generation. Leave empty for random images each time.';
 
 // Action: generate_text.
-$string['action:generate_text:endpoint'] = 'API endpoint';
 $string['action:generate_text:model'] = 'AI model';
 $string['action:generate_text:model_desc'] = 'The Pollinations text model used to generate the response. Models are fetched automatically from the Pollinations API.';
 $string['action:generate_text:systeminstruction'] = 'System instruction';
 $string['action:generate_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
 
 // Action: summarise_text.
-$string['action:summarise_text:endpoint'] = 'API endpoint';
 $string['action:summarise_text:model'] = 'AI model';
 $string['action:summarise_text:model_desc'] = 'The Pollinations text model used to summarise the provided text. Models are fetched automatically from the Pollinations API.';
 $string['action:summarise_text:systeminstruction'] = 'System instruction';
 $string['action:summarise_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
-
-// Action: generate_image.
-$string['action:generate_image:endpoint'] = 'Image API base URL';
-$string['action:generate_image:endpoint_desc'] = 'The base URL for Pollinations image generation. The plugin appends /image/{prompt} automatically.';
-$string['action:generate_image:model'] = 'Image model';
-$string['action:generate_image:model_desc'] = 'The Pollinations image model to use. Models are fetched automatically from the Pollinations API.';
-$string['action:generate_image:seed'] = 'Image seed (optional)';
-$string['action:generate_image:seed_desc'] = 'Set a numeric seed for reproducible image generation. Leave empty for random images each time.';
 
 // Model info section.
 $string['modelinfo_count'] = '{$a} models available';

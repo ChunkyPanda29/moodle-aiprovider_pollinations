@@ -42,11 +42,14 @@ class provider extends \core_ai\provider {
      */
     public const DEFAULT_APP_KEY = 'pk_JpcODXmxY8ORHqe6';
 
+    /** @var string The Pollinations text API endpoint. */
+    public const TEXT_API_ENDPOINT = 'https://gen.pollinations.ai/v1/chat/completions';
+
+    /** @var string The Pollinations image API base URL. */
+    public const IMAGE_API_BASE = 'https://gen.pollinations.ai';
+
     /** @var string The Pollinations API key (sk_... obtained via BYOP or manual entry). */
     private string $apikey;
-
-    /** @var string The BYOP publishable app key. */
-    private string $appkey;
 
     /** @var bool Is global rate limiting for the API enabled. */
     private bool $enableglobalratelimit;
@@ -65,21 +68,10 @@ class provider extends \core_ai\provider {
      */
     public function __construct() {
         $this->apikey = get_config('aiprovider_pollinations', 'apikey') ?? '';
-        $appkey = get_config('aiprovider_pollinations', 'appkey');
-        $this->appkey = !empty($appkey) ? $appkey : self::DEFAULT_APP_KEY;
         $this->enableglobalratelimit = (bool) get_config('aiprovider_pollinations', 'enableglobalratelimit');
         $this->globalratelimit = (int) get_config('aiprovider_pollinations', 'globalratelimit');
         $this->enableuserratelimit = (bool) get_config('aiprovider_pollinations', 'enableuserratelimit');
         $this->userratelimit = (int) get_config('aiprovider_pollinations', 'userratelimit');
-    }
-
-    /**
-     * Get the BYOP publishable app key.
-     *
-     * @return string The app key (pk_...).
-     */
-    public function get_app_key(): string {
-        return $this->appkey;
     }
 
     /**
@@ -99,7 +91,7 @@ class provider extends \core_ai\provider {
      * Generate a user id.
      *
      * This is a hash of the site id and user id,
-     * this means we can determine who made the request
+     * which means we can determine who made the request
      * but don't pass any personal data to Pollinations.
      *
      * @param string $userid The user id.
@@ -194,15 +186,6 @@ class provider extends \core_ai\provider {
                 $this->get_all_models('text'),
             );
 
-            // API endpoint.
-            $settings[] = new \admin_setting_configtext(
-                "aiprovider_pollinations/action_{$actionname}_endpoint",
-                new \lang_string("action:{$actionname}:endpoint", 'aiprovider_pollinations'),
-                '',
-                'https://gen.pollinations.ai/v1/chat/completions',
-                PARAM_URL,
-            );
-
             // System instruction.
             $settings[] = new \admin_setting_configtextarea(
                 "aiprovider_pollinations/action_{$actionname}_systeminstruction",
@@ -219,15 +202,6 @@ class provider extends \core_ai\provider {
                 new \lang_string("action:{$actionname}:model_desc", 'aiprovider_pollinations'),
                 'flux',
                 $this->get_all_models('image'),
-            );
-
-            // Image API endpoint (base URL — the processor appends /image/{prompt}).
-            $settings[] = new \admin_setting_configtext(
-                "aiprovider_pollinations/action_{$actionname}_endpoint",
-                new \lang_string("action:{$actionname}:endpoint", 'aiprovider_pollinations'),
-                new \lang_string("action:{$actionname}:endpoint_desc", 'aiprovider_pollinations'),
-                'https://gen.pollinations.ai',
-                PARAM_URL,
             );
 
             // Optional seed for reproducible images.
@@ -248,7 +222,7 @@ class provider extends \core_ai\provider {
      *
      * @return bool Return true if configured.
      */
-    public function is_provider_configured(): bool {
+    public function is_provider_configred(): bool {
         return !empty($this->apikey);
     }
 

@@ -47,7 +47,7 @@ class process_generate_image extends abstract_processor {
      */
     #[\Override]
     protected function get_endpoint(): UriInterface {
-        return new Uri(get_config('aiprovider_pollinations', 'action_generate_image_endpoint'));
+        return new Uri(provider::IMAGE_API_BASE);
     }
 
     /**
@@ -131,10 +131,10 @@ class process_generate_image extends abstract_processor {
             $params['seed'] = (int) $seed;
         }
 
-        // Add safety setting if configured.
-        $safety = get_config('aiprovider_pollinations', 'safety');
-        if (!empty($safety) && $safety !== '0') {
-            $params['safe'] = $safety;
+        // Add safety setting if enabled.
+        $safety = get_config('aiprovider_pollinations', 'enablesafety');
+        if (!empty($safety)) {
+            $params['safe'] = 'privacy,secrets';
         }
 
         $querystring = http_build_query($params);

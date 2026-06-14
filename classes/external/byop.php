@@ -41,8 +41,7 @@ class byop extends external_api {
      * @return string
      */
     private static function get_app_key(): string {
-        $override = get_config('aiprovider_pollinations', 'appkey');
-        return !empty($override) ? $override : \aiprovider_pollinations\provider::DEFAULT_APP_KEY;
+        return \aiprovider_pollinations\provider::DEFAULT_APP_KEY;
     }
 
     /**

@@ -80,9 +80,9 @@ abstract class abstract_processor extends process_base {
      * @return string|null The safety value or null if disabled.
      */
     protected function get_safety_header(): ?string {
-        $safety = get_config('aiprovider_pollinations', 'safety');
-        if (!empty($safety) && $safety !== '0') {
-            return $safety;
+        $enabled = (bool) get_config('aiprovider_pollinations', 'enablesafety');
+        if ($enabled) {
+            return 'privacy,secrets';
         }
         return null;
     }
