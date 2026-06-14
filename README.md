@@ -8,6 +8,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue?style=flat-square)](LICENSE)
 [![GitHub release](https://img.shields.io/badge/Release-1.1.0-brightgreen?style=flat-square)](https://github.com/ChunkyPanda29/moodle_aiprovider_pollinations/releases)
 [![GitHub Issues](https://img.shields.io/github/issues/ChunkyPanda29/moodle_aiprovider_pollinations?style=flat-square)](https://github.com/ChunkyPanda29/moodle_aiprovider_pollinations/issues)
+[![CI](https://github.com/ChunkyPanda29/moodle_aiprovider_pollinations/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ChunkyPanda29/moodle_aiprovider_pollinations/actions/workflows/ci.yml)
 
 A Moodle AI provider plugin that integrates [Pollinations.ai](https://pollinations.ai) — the affordable, multi-model AI inference platform — into Moodle 4.5+ (and later).
 
