@@ -27,10 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
     // Low pollen balance notification.
     'lowbalance' => [
-        'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
-        ],
         'capability' => 'moodle/site:config',
     ],
 ];
