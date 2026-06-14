@@ -45,7 +45,7 @@ class process_generate_image extends abstract_processor {
      *
      * @return UriInterface
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_generate_image_endpoint'));
     }
@@ -55,7 +55,7 @@ class process_generate_image extends abstract_processor {
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_generate_image_model');
     }
@@ -67,7 +67,7 @@ class process_generate_image extends abstract_processor {
      * uses a GET request with URL parameters (not a POST with JSON body).
      * The response is raw image bytes, not JSON.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function query_ai_api(): array {
         // Build the full image URL with query parameters.
         $imageurl = $this->build_image_url();
@@ -252,7 +252,7 @@ class process_generate_image extends abstract_processor {
      * @param string $userid The user id.
      * @return RequestInterface
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function create_request_object(string $userid): RequestInterface {
         // Not used — see overridden query_ai_api().
         return new Request(method: 'GET', uri: '');

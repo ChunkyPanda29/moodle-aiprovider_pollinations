@@ -40,7 +40,7 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function get_metadata(collection $collection): collection {
         $collection->add_external_location_link('aiprovider_pollinations', [
             'prompttext' => 'privacy:metadata:aiprovider_pollinations:prompttext',
@@ -56,7 +56,7 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function get_contexts_for_userid(int $userid): contextlist {
         return new contextlist();
     }
@@ -66,7 +66,7 @@ class provider implements
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function get_users_in_context(userlist $userlist) {
     }
 
@@ -75,7 +75,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function export_user_data(approved_contextlist $contextlist) {
     }
 
@@ -84,7 +84,7 @@ class provider implements
      *
      * @param \context $context The specific context to delete data for.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function delete_data_for_all_users_in_context(\context $context) {
     }
 
@@ -101,7 +101,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     public static function delete_data_for_user(approved_contextlist $contextlist) {
     }
 }

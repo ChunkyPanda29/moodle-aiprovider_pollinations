@@ -94,7 +94,7 @@ abstract class abstract_processor extends process_base {
      *
      * @return array The response array.
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function query_ai_api(): array {
         $request = $this->create_request_object(
             userid: $this->provider->generate_userid($this->action->get_configuration('userid')),

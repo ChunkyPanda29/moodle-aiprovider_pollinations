@@ -32,7 +32,7 @@ class process_summarise_text extends process_generate_text {
      *
      * @return UriInterface
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_summarise_text_endpoint'));
     }
@@ -42,7 +42,7 @@ class process_summarise_text extends process_generate_text {
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_summarise_text_model');
     }
@@ -52,7 +52,7 @@ class process_summarise_text extends process_generate_text {
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_system_instruction(): string {
         return get_config('aiprovider_pollinations', 'action_summarise_text_systeminstruction');
     }

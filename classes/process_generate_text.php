@@ -35,7 +35,7 @@ class process_generate_text extends abstract_processor {
      *
      * @return UriInterface
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_endpoint(): UriInterface {
         return new Uri(get_config('aiprovider_pollinations', 'action_generate_text_endpoint'));
     }
@@ -45,7 +45,7 @@ class process_generate_text extends abstract_processor {
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_model(): string {
         return get_config('aiprovider_pollinations', 'action_generate_text_model');
     }
@@ -55,7 +55,7 @@ class process_generate_text extends abstract_processor {
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function get_system_instruction(): string {
         return get_config('aiprovider_pollinations', 'action_generate_text_systeminstruction');
     }
@@ -66,7 +66,7 @@ class process_generate_text extends abstract_processor {
      * @param string $userid The user id.
      * @return RequestInterface
      */
-    #[\ReturnTypeWillChange]
+    #[\Override]
     protected function create_request_object(string $userid): RequestInterface {
         /*
          * Pollinations uses an OpenAI-compatible chat completions API.
