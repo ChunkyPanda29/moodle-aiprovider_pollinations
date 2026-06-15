@@ -22,66 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// General.
-$string['pluginname'] = 'Pollinations AI provider';
-
-// API settings.
-$string['apikey'] = 'Pollinations API key';
-$string['apikey_desc'] = 'Your Pollinations secret key (sk_...). This is set automatically via the Connect to Pollinations flow above, but can also be entered manually for testing.';
-
-// BYOP connection.
-$string['byop_connect'] = 'Connect to Pollinations';
-$string['byop_connected'] = 'Connected as {$a}';
-$string['byop_disconnected'] = 'Not connected';
-$string['byop_heading'] = 'Pollinations Connection';
-
-// Rate limiting.
-$string['enableglobalratelimit'] = 'Set site-wide rate limit';
-$string['enableglobalratelimit_desc'] = 'Limit the number of requests that the Pollinations API provider can receive across the entire site every hour.';
-$string['enableuserratelimit'] = 'Set per-user rate limit';
-$string['enableuserratelimit_desc'] = 'Limit the number of requests that each individual user can make to the Pollinations API provider per hour. Recommended for cost control when using paid pollen balance.';
-$string['globalratelimit'] = 'Maximum number of site-wide requests';
-$string['globalratelimit_desc'] = 'The number of site-wide requests allowed per hour.';
-$string['ratelimit_heading'] = 'Rate limiting';
-$string['userratelimit'] = 'Maximum number of requests per user';
-$string['userratelimit_desc'] = 'The number of requests each user is allowed per hour.';
-
-// Safety settings.
-$string['safety_heading'] = 'Content safety';
-$string['safety_nsfw'] = 'Block mature content (sexual & violent)';
-$string['safety_nsfw_desc'] = 'Block requests and responses containing sexual or violent content.';
-$string['safety_privacy'] = 'Redact personal information (privacy)';
-$string['safety_privacy_desc'] = 'Automatically redact names, emails, phone numbers, addresses, IPs, URLs, and usernames before sending to the AI model.';
-$string['safety_secrets'] = 'Redact secrets';
-$string['safety_secrets_desc'] = 'Automatically redact API keys, passwords, and tokens before sending to the AI model.';
-
-// Action: generate_image.
-$string['action:generate_image:model'] = 'Image model';
-$string['action:generate_image:model_desc'] = 'The Pollinations image model to use. Models are fetched automatically from the Pollinations API.';
-$string['action:generate_image:seed'] = 'Image seed (optional)';
-$string['action:generate_image:seed_desc'] = 'Set a numeric seed for reproducible image generation. Leave empty for random images each time.';
-
-// Action: generate_text.
-$string['action:generate_text:model'] = 'AI model';
-$string['action:generate_text:model_desc'] = 'The Pollinations text model used to generate the response. Models are fetched automatically from the Pollinations API.';
-$string['action:generate_text:systeminstruction'] = 'System instruction';
-$string['action:generate_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
-
-// Action: summarise_text.
-$string['action:summarise_text:model'] = 'AI model';
-$string['action:summarise_text:model_desc'] = 'The Pollinations text model used to summarise the provided text. Models are fetched automatically from the Pollinations API.';
-$string['action:summarise_text:systeminstruction'] = 'System instruction';
-$string['action:summarise_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
-
-// Model info section.
-$string['modelinfo_count'] = '{$a} models available';
-$string['modelinfo_desc'] = 'Information about available Pollinations models. Models are refreshed daily via a scheduled task.';
-$string['modelinfo_heading'] = 'Model information';
-$string['modelinfo_lastupdated'] = 'Last updated';
-$string['modelinfo_never'] = 'Never (run the update_models scheduled task)';
-$string['modelinfo_nocached'] = 'No cached model data. Run the update_models scheduled task or check your API key.';
-
-// Account section.
 $string['account_balance_current'] = 'Current pollen balance';
 $string['account_balance_total'] = 'Total: {$a} pollen';
 $string['account_balance_unknown'] = 'Unknown (check API key)';
@@ -90,25 +30,40 @@ $string['account_balancethreshold_desc'] = 'When the pollen balance drops below 
 $string['account_heading'] = 'Account & balance';
 $string['account_paid_balance'] = 'Paid balance: {$a} pollen';
 $string['account_tier_balance'] = 'Tier balance: {$a} pollen';
-
-// BYOP error messages.
+$string['action:generate_image:model'] = 'Image model';
+$string['action:generate_image:model_desc'] = 'The Pollinations image model to use. Models are fetched automatically from the Pollinations API.';
+$string['action:generate_image:seed'] = 'Image seed (optional)';
+$string['action:generate_image:seed_desc'] = 'Set a numeric seed for reproducible image generation. Leave empty for random images each time.';
+$string['action:generate_text:model'] = 'AI model';
+$string['action:generate_text:model_desc'] = 'The Pollinations text model used to generate the response. Models are fetched automatically from the Pollinations API.';
+$string['action:generate_text:systeminstruction'] = 'System instruction';
+$string['action:generate_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
+$string['action:summarise_text:model'] = 'AI model';
+$string['action:summarise_text:model_desc'] = 'The Pollinations text model used to summarise the provided text. Models are fetched automatically from the Pollinations API.';
+$string['action:summarise_text:systeminstruction'] = 'System instruction';
+$string['action:summarise_text:systeminstruction_desc'] = 'This instruction is sent to the AI model along with the user\'s prompt. Editing this instruction is not recommended unless absolutely required.';
+$string['apikey'] = 'Pollinations API key';
+$string['apikey_desc'] = 'Your Pollinations secret key (sk_...). This is set automatically via the Connect to Pollinations flow above, but can also be entered manually for testing.';
+$string['byop_connect'] = 'Connect to Pollinations';
+$string['byop_connected'] = 'Connected as {$a}';
+$string['byop_disconnected'] = 'Not connected';
+$string['byop_heading'] = 'Pollinations Connection';
+$string['enableglobalratelimit'] = 'Set site-wide rate limit';
+$string['enableglobalratelimit_desc'] = 'Limit the number of requests that the Pollinations API provider can receive across the entire site every hour.';
+$string['enableuserratelimit'] = 'Set per-user rate limit';
+$string['enableuserratelimit_desc'] = 'Limit the number of requests that each individual user can make to the Pollinations API provider per hour. Recommended for cost control when using paid pollen balance.';
+$string['error_apirequest'] = 'Error communicating with the Pollinations API: {$a}';
+$string['error_authfailed'] = 'Authentication failed: The API key is invalid or expired. Please check the Pollinations API key in the provider settings.';
+$string['error_badrequest'] = 'Bad request: {$a}';
+$string['error_badrequest_default'] = 'Invalid request';
 $string['error_byop_denied'] = 'Authorisation was denied.';
 $string['error_byop_expired'] = 'The device code has expired. Please try again.';
 $string['error_byop_invalidresponse'] = 'Invalid response from Pollinations.';
 $string['error_byop_requestfailed'] = 'Request to Pollinations failed. Please try again.';
 $string['error_byop_unexpected'] = 'Unexpected response from Pollinations.';
-
-// Rate limit messages.
-$string['error_globalratelimit'] = 'Global rate limit exceeded';
-$string['error_userratelimit'] = 'User rate limit exceeded';
-
-// Error messages.
-$string['error_apirequest'] = 'Error communicating with the Pollinations API: {$a}';
-$string['error_authfailed'] = 'Authentication failed: The API key is invalid or expired. Please check the Pollinations API key in the provider settings.';
-$string['error_badrequest'] = 'Bad request: {$a}';
-$string['error_badrequest_default'] = 'Invalid request';
 $string['error_connection'] = 'Connection error: {$a}';
 $string['error_forbidden'] = 'Access forbidden: This model may require a paid plan. Check your Pollinations subscription.';
+$string['error_globalratelimit'] = 'Global rate limit exceeded';
 $string['error_httpgeneric'] = 'HTTP {$a->status}: {$a->phrase}';
 $string['error_invalidresponse'] = 'Invalid response from Pollinations API.';
 $string['error_noapikey'] = 'Pollinations API key is not configured.';
@@ -118,23 +73,39 @@ $string['error_ratelimit_exceeded'] = 'Rate limit exceeded: Too many requests to
 $string['error_retryexhausted'] = '{$a->message} (failed after {$a->attempts} attempts)';
 $string['error_servererror'] = 'Pollinations server error (HTTP {$a->status}): {$a->phrase}';
 $string['error_unknown'] = 'Unknown error: request failed without a response.';
+$string['error_userratelimit'] = 'User rate limit exceeded';
 $string['getallmodels_error'] = 'Unable to fetch models. Please check your API key.';
-
-// Privacy.
+$string['globalratelimit'] = 'Maximum number of site-wide requests';
+$string['globalratelimit_desc'] = 'The number of site-wide requests allowed per hour.';
+$string['modelinfo_count'] = '{$a} models available';
+$string['modelinfo_desc'] = 'Information about available Pollinations models. Models are refreshed daily via a scheduled task.';
+$string['modelinfo_heading'] = 'Model information';
+$string['modelinfo_lastupdated'] = 'Last updated';
+$string['modelinfo_never'] = 'Never (run the update_models scheduled task)';
+$string['modelinfo_nocached'] = 'No cached model data. Run the update_models scheduled task or check your API key.';
+$string['pluginname'] = 'Pollinations AI provider';
 $string['privacy:metadata'] = 'The Pollinations AI provider plugin does not store any personal data.';
 $string['privacy:metadata:aiprovider_pollinations:externalpurpose'] = 'This information is sent to the Pollinations API in order for a response to be generated. Your Pollinations account settings may change how Pollinations stores and retains this data. No user data is explicitly sent to Pollinations or stored in Moodle LMS by this plugin.';
 $string['privacy:metadata:aiprovider_pollinations:model'] = 'The model used to generate the response.';
 $string['privacy:metadata:aiprovider_pollinations:prompttext'] = 'The user entered text prompt used to generate the response.';
 $string['privacy:metadata:aiprovider_pollinations:systeminstruction'] = 'The system instruction sent with the request.';
-
-// Scheduled tasks.
-$string['task_balance_skipped'] = 'Pollinations API key not configured. Skipping balance check.';
+$string['ratelimit_heading'] = 'Rate limiting';
+$string['safety_heading'] = 'Content safety';
+$string['safety_nsfw'] = 'Block mature content (sexual & violent)';
+$string['safety_nsfw_desc'] = 'Block requests and responses containing sexual or violent content.';
+$string['safety_privacy'] = 'Redact personal information (privacy)';
+$string['safety_privacy_desc'] = 'Automatically redact names, emails, phone numbers, addresses, IPs, URLs, and usernames before sending to the AI model.';
+$string['safety_secrets'] = 'Redact secrets';
+$string['safety_secrets_desc'] = 'Automatically redact API keys, passwords, and tokens before sending to the AI model.';
 $string['task_balance_check_failed'] = 'Failed to check Pollinations balance: {$a}';
 $string['task_balance_checked'] = 'Pollinations balance checked: {$a} pollen.';
 $string['task_balance_low_body'] = 'The Pollinations AI provider pollen balance has dropped to {$a} pollen. Please top up your account at https://pollinations.ai to avoid service disruption.';
 $string['task_balance_low_subject'] = 'Pollinations AI balance low: {$a} pollen remaining';
 $string['task_balance_notified'] = 'Low balance notification sent to {$a} admin(s).';
+$string['task_balance_skipped'] = 'Pollinations API key not configured. Skipping balance check.';
 $string['task_check_balance'] = 'Check Pollinations pollen balance';
 $string['task_models_update_failed'] = 'Failed to update Pollinations model list: {$a}';
 $string['task_models_updated'] = 'Pollinations {$a->type} models updated: {$a->count} models available.';
 $string['task_update_models'] = 'Update Pollinations model list';
+$string['userratelimit'] = 'Maximum number of requests per user';
+$string['userratelimit_desc'] = 'The number of requests each user is allowed per hour.';
