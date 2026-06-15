@@ -44,7 +44,7 @@ class process_summarise_text extends process_generate_text {
      */
     #[\Override]
     protected function get_model(): string {
-        return get_config('aiprovider_pollinations', 'action_summarise_text_model');
+        return get_config('aiprovider_pollinations', 'action_summarise_text_model') ?: 'openai';
     }
 
     /**
@@ -54,6 +54,6 @@ class process_summarise_text extends process_generate_text {
      */
     #[\Override]
     protected function get_system_instruction(): string {
-        return get_config('aiprovider_pollinations', 'action_summarise_text_systeminstruction');
+        return get_config('aiprovider_pollinations', 'action_summarise_text_systeminstruction') ?? '';
     }
 }

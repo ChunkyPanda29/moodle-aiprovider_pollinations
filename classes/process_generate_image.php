@@ -57,7 +57,7 @@ class process_generate_image extends abstract_processor {
      */
     #[\Override]
     protected function get_model(): string {
-        return get_config('aiprovider_pollinations', 'action_generate_image_model');
+        return get_config('aiprovider_pollinations', 'action_generate_image_model') ?: 'flux';
     }
 
     /**
