@@ -238,21 +238,6 @@ GNU General Public License v3.0 or later. See [LICENSE](LICENSE) for details.
 - Site-wide rate limiting
 - Privacy provider (GDPR/POPIA compliant)
 
-## For Plugin Reviewers
-
-To test this plugin without setting up your own Pollinations account, use the following API key:
-
-```
-sk_UNBiwhSPKusdImzzUC70tD1uLD5vvKSC
-```
-
-1. Install the plugin on a Moodle 4.5+ site
-2. Go to **Site administration → AI providers → Pollinations**
-3. Paste the API key above into the **API key** field
-4. Save changes
-5. Enable AI placements (**Site administration → AI placements**)
-6. Test the **Summarise**, **Generate text**, and **Generate image** actions from any course page
-
 ## Documentation
 
 - **Full documentation:** [README on GitHub](https://github.com/ChunkyPanda29/moodle_aiprovider_pollinations#readme)
