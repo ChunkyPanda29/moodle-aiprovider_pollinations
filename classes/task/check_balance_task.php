@@ -40,7 +40,7 @@ class check_balance_task extends \core\task\scheduled_task {
         $provider = new \aiprovider_pollinations\provider();
 
         if (!$provider->is_provider_configured()) {
-            mtrace('Pollinations API key not configured. Skipping balance check.');
+            mtrace(get_string('task_balance_skipped', 'aiprovider_pollinations'));
             return;
         }
 

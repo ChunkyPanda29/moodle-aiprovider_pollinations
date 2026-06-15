@@ -91,6 +91,17 @@ $string['account_heading'] = 'Account & balance';
 $string['account_paid_balance'] = 'Paid balance: {$a} pollen';
 $string['account_tier_balance'] = 'Tier balance: {$a} pollen';
 
+// BYOP error messages.
+$string['error_byop_denied'] = 'Authorisation was denied.';
+$string['error_byop_expired'] = 'The device code has expired. Please try again.';
+$string['error_byop_invalidresponse'] = 'Invalid response from Pollinations.';
+$string['error_byop_requestfailed'] = 'Request to Pollinations failed. Please try again.';
+$string['error_byop_unexpected'] = 'Unexpected response from Pollinations.';
+
+// Rate limit messages.
+$string['error_globalratelimit'] = 'Global rate limit exceeded';
+$string['error_userratelimit'] = 'User rate limit exceeded';
+
 // Error messages.
 $string['error_apirequest'] = 'Error communicating with the Pollinations API: {$a}';
 $string['error_authfailed'] = 'Authentication failed: The API key is invalid or expired. Please check the Pollinations API key in the provider settings.';
@@ -117,6 +128,7 @@ $string['privacy:metadata:aiprovider_pollinations:prompttext'] = 'The user enter
 $string['privacy:metadata:aiprovider_pollinations:systeminstruction'] = 'The system instruction sent with the request.';
 
 // Scheduled tasks.
+$string['task_balance_skipped'] = 'Pollinations API key not configured. Skipping balance check.';
 $string['task_balance_check_failed'] = 'Failed to check Pollinations balance: {$a}';
 $string['task_balance_checked'] = 'Pollinations balance checked: {$a} pollen.';
 $string['task_balance_low_body'] = 'The Pollinations AI provider pollen balance has dropped to {$a} pollen. Please top up your account at https://pollinations.ai to avoid service disruption.';

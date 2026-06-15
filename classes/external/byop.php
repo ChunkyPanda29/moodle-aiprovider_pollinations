@@ -41,11 +41,6 @@ use GuzzleHttp\Psr7\Request;
  */
 class byop extends external_api {
     /**
-     * The BYOP publishable app key.
-     */
-    const APP_KEY = 'pk_JpcODXmxY8ORHqe6';
-
-    /**
      * Initiate the BYOP device authorisation flow.
      *
      * Requests a device code from Pollinations. The user must visit
@@ -61,7 +56,7 @@ class byop extends external_api {
             uri: 'https://enter.pollinations.ai/api/device/code',
             headers: ['Content-Type' => 'application/json'],
             body: json_encode([
-                'client_id' => self::APP_KEY,
+                'client_id' => provider::DEFAULT_APP_KEY,
                 'scope' => 'generate',
             ]),
         );
@@ -75,7 +70,7 @@ class byop extends external_api {
             if (!is_array($body) || !isset($body['device_code'])) {
                 return [
                     'success' => false,
-                    'error' => 'Invalid response from Pollinations.',
+                    'error' => get_string('error_byop_invalidresponse', 'aiprovider_pollinations'),
                 ];
             }
 
@@ -88,13 +83,7 @@ class byop extends external_api {
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Parameters for init_device_flow.
+                'error' => get_string('error_byop_requestfailed', 'aiprovider_pollinations'),
      *
      * @return external_function_parameters
      */
@@ -170,7 +159,7 @@ class byop extends external_api {
                 return [
                     'success' => false,
                     'pending' => false,
-                    'error' => 'Authorization was denied.',
+                    'error' => get_string('error_byop_denied', 'aiprovider_pollinations'),
                 ];
             }
 
@@ -179,7 +168,7 @@ class byop extends external_api {
                 return [
                     'success' => false,
                     'pending' => false,
-                    'error' => 'The device code has expired. Please try again.',
+                    'error' => get_string('error_byop_expired', 'aiprovider_pollinations'),
                 ];
             }
 
@@ -198,19 +187,13 @@ class byop extends external_api {
             return [
                 'success' => false,
                 'pending' => false,
-                'error' => 'Unexpected response from Pollinations.',
+                'error' => get_string('error_byop_unexpected', 'aiprovider_pollinations'),
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
                 'pending' => false,
-                'error' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Parameters for poll_device_token.
+                'error' => get_string('error_byop_requestfailed', 'aiprovider_pollinations'),
      *
      * @return external_function_parameters
      */

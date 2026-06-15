@@ -17,7 +17,6 @@
 namespace aiprovider_pollinations;
 
 use core\http_client;
-use core_ai\aiactions\responses\response_base;
 use core_ai\process_base;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
@@ -34,7 +33,7 @@ use Psr\Http\Message\UriInterface;
  */
 abstract class abstract_processor extends process_base {
     /** @var int Maximum retry attempts for transient failures. */
-    private const MAX_RETRIES = 3;
+    protected const MAX_RETRIES = 3;
 
     /** @var int Base delay between retries in milliseconds. */
     private const RETRY_BASE_DELAY_MS = 1000;
@@ -207,7 +206,7 @@ abstract class abstract_processor extends process_base {
      * @param int $status The HTTP status code.
      * @return bool True if the error is transient and worth retrying.
      */
-    private function is_retryable_error(int $status): bool {
+    protected function is_retryable_error(int $status): bool {
         // 429 = rate limited, 5xx = server errors.
         return $status === 429 || ($status >= 500 && $status < 600);
     }
@@ -217,7 +216,7 @@ abstract class abstract_processor extends process_base {
      *
      * @param int $attempt The current attempt number (1-based).
      */
-    private function sleep_before_retry(int $attempt): void {
+    protected function sleep_before_retry(int $attempt): void {
         $delayms = self::RETRY_BASE_DELAY_MS * (2 ** ($attempt - 1));
         // Add up to 25% random jitter to avoid thundering herd.
         $jitter = mt_rand(0, (int) ($delayms * 0.25));

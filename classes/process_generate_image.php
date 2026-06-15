@@ -17,6 +17,7 @@
 namespace aiprovider_pollinations;
 
 use core_ai\ai_image;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\RequestInterface;
@@ -66,6 +67,8 @@ class process_generate_image extends abstract_processor {
      * Override parent query_ai_api because Pollinations image generation
      * uses a GET request with URL parameters (not a POST with JSON body).
      * The response is raw image bytes, not JSON.
+     *
+     * Includes retry logic matching the parent class for transient failures.
      */
     #[\Override]
     protected function query_ai_api(): array {
@@ -78,26 +81,76 @@ class process_generate_image extends abstract_processor {
         );
         $request = $this->provider->add_authentication_headers($request);
 
+        // Add safety header if configured.
+        $safety = $this->get_safety_header();
+        if ($safety !== null) {
+            $request = $request->withAddedHeader('Pollinations-Safe', $safety);
+        }
+
         $client = \core\di::get(\core\http_client::class);
 
-        try {
-            $response = $client->send($request, [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
-            ]);
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            return [
-                'success' => false,
-                'errorcode' => $e->getCode(),
-                'errormessage' => $e->getMessage(),
-            ];
-        }
+        $attempt = 0;
+        $lasterror = null;
 
-        $status = $response->getStatusCode();
-        if ($status === 200) {
-            return $this->handle_api_success($response);
-        } else {
+        while ($attempt < self::MAX_RETRIES) {
+            $attempt++;
+
+            try {
+                $response = $client->send($request, [
+                    \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => self::REQUEST_TIMEOUT,
+                    \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 15,
+                ]);
+            } catch (RequestException $e) {
+                $lasterror = [
+                    'success' => false,
+                    'errorcode' => $e->getCode(),
+                    'errormessage' => get_string('error_connection', 'aiprovider_pollinations', $e->getMessage()),
+                ];
+
+                if ($attempt < self::MAX_RETRIES) {
+                    $this->sleep_before_retry($attempt);
+                    continue;
+                }
+                break;
+            }
+
+            $status = $response->getStatusCode();
+
+            if ($status === 200) {
+                return $this->handle_api_success($response);
+            }
+
+            if ($this->is_retryable_error($status) && $attempt < self::MAX_RETRIES) {
+                $lasterror = $this->handle_api_error($response);
+
+                $retryafter = $response->getHeaderLine('Retry-After');
+                if (!empty($retryafter) && is_numeric($retryafter)) {
+                    usleep((int) $retryafter * 1000000);
+                } else {
+                    $this->sleep_before_retry($attempt);
+                }
+                continue;
+            }
+
             return $this->handle_api_error($response);
         }
+
+        // Exhausted all retries.
+        if ($lasterror !== null) {
+            $lasterror['errormessage'] = get_string(
+                'error_retryexhausted',
+                'aiprovider_pollinations',
+                ['message' => $lasterror['errormessage'], 'attempts' => $attempt],
+            );
+            return $lasterror;
+        }
+
+        return [
+            'success' => false,
+            'errorcode' => 500,
+            'errormessage' => get_string('error_unknown', 'aiprovider_pollinations'),
+        ];
     }
 
     /**
@@ -245,6 +298,9 @@ class process_generate_image extends abstract_processor {
 
         $fs = get_file_storage();
         $fileobj = $fs->create_file_from_string($fileinfo, file_get_contents($tempdst));
+
+        // Clean up the temporary file.
+        @unlink($tempdst);
 
         return [
             'success' => true,
