@@ -22,6 +22,7 @@ use core_external\external_single_structure;
 use core_external\external_value;
 use core\http_client;
 use GuzzleHttp\Psr7\Request;
+use aiprovider_pollinations\provider;
 
 /**
  * External API class for BYOP device flow integration.
