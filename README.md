@@ -18,35 +18,38 @@ A Moodle AI provider plugin that integrates [Pollinations.ai](https://pollinatio
 
 ### Settings Page
 
-| Not Connected | Connected |
-|---|---|
-| ![Settings - Not Connected](https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/settings-page-not-connected.png) | ![Settings - Connected](https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/settings-page-connected.png) |
+<table>
+<tr>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/settings-page-not-connected.png" width="400" alt="Settings - Not Connected" /></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/settings-page-connected.png" width="400" alt="Settings - Connected" /></td>
+</tr>
+</table>
 
 ### BYOP Device Flow (Connect to Pollinations)
 
 <table>
 <tr>
-<td width="400" align="center"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect1.png" width="400" alt="Step 1" /><br><strong>Step 1: Click Connect</strong></td>
-<td width="400" align="center"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect2.png" width="400" alt="Step 2" /><br><strong>Step 2: Enter code</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect1.png" width="400" alt="Step 1" /><br><strong>Step 1: Click Connect</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect2.png" width="400" alt="Step 2" /><br><strong>Step 2: Enter code</strong></td>
 </tr>
 <tr>
-<td width="400" align="center"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect3.png" width="400" alt="Step 3" /><br><strong>Step 3: Authorising…</strong></td>
-<td width="400" align="center"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect4.png" width="400" alt="Step 4" /><br><strong>Step 4: Connected!</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect3.png" width="400" alt="Step 3" /><br><strong>Step 3: Authorising…</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/byop-connect4.png" width="400" alt="Step 4" /><br><strong>Step 4: Connected!</strong></td>
 </tr>
 </table>
 
 ### Model Picker
 
 <table><tr>
-<td width="400"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/model-picker.png" width="400" alt="Generate Text Settings" /><br><strong>Settings page</strong></td>
-<td width="400"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/model-picker-selector.png" width="400" alt="Model Dropdown" /><br><strong>Model dropdown</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/model-picker.png" width="400" alt="Settings page" /><br><strong>Settings page</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/model-picker-selector.png" width="400" alt="Model dropdown" /><br><strong>Model dropdown</strong></td>
 </tr></table>
 
 ### AI in Action
 
 <table><tr>
-<td width="400"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/generate_text1.png" width="400" alt="Text Generation" /><br><strong>Text generation in TinyMCE</strong></td>
-<td width="400"><img src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/generate_image1.png" width="400" alt="Image Generation" /><br><strong>Image generation result</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/generate_text1.png" width="400" alt="Text generation in TinyMCE" /><br><strong>Text generation in TinyMCE</strong></td>
+<td width="400"><img class="img-responsive" src="https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/raw/main/screenshots/generate_image1.png" width="400" alt="Image generation result" /><br><strong>Image generation result</strong></td>
 </tr></table>
 
 This plugin enables text generation, text summarisation, and image generation through Moodle's native AI subsystem, powered by Pollinations' OpenAI-compatible API. With 60+ models from OpenAI, Anthropic, Google, ByteDance, Meta, Mistral, and more, Pollinations offers some of the most competitive AI pricing available.
