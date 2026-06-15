@@ -256,7 +256,8 @@ abstract class abstract_processor extends process_base {
                 $responsearr['errormessage'] = get_string('error_ratelimit_exceeded', 'aiprovider_pollinations');
                 break;
             case 400:
-                $msg = $bodyobj->error->message ?? $bodyobj->message ?? get_string('error_badrequest_default', 'aiprovider_pollinations');
+                $default = get_string('error_badrequest_default', 'aiprovider_pollinations');
+                $msg = $bodyobj->error->message ?? $bodyobj->message ?? $default;
                 $responsearr['errormessage'] = get_string('error_badrequest', 'aiprovider_pollinations', $msg);
                 break;
             default:

@@ -40,6 +40,7 @@ use GuzzleHttp\Psr7\Request;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class byop extends external_api {
+
     /**
      * Initiate the BYOP device authorisation flow.
      *
@@ -84,6 +85,12 @@ class byop extends external_api {
             return [
                 'success' => false,
                 'error' => get_string('error_byop_requestfailed', 'aiprovider_pollinations'),
+            ];
+        }
+    }
+
+    /**
+     * Parameters for init_device_flow.
      *
      * @return external_function_parameters
      */
@@ -194,6 +201,12 @@ class byop extends external_api {
                 'success' => false,
                 'pending' => false,
                 'error' => get_string('error_byop_requestfailed', 'aiprovider_pollinations'),
+            ];
+        }
+    }
+
+    /**
+     * Parameters for poll_device_token.
      *
      * @return external_function_parameters
      */
