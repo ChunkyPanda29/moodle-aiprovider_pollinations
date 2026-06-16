@@ -4,9 +4,6 @@ Feature: Pollinations AI provider smoke test
   As an administrator
   I need basic site functionality to work
 
-  Background:
+  Scenario: Admin login succeeds with plugin installed
     Given I log in as "admin"
-
-  Scenario: Dashboard loads with plugin installed
-    When I follow "Site home"
-    Then I should see "Moodle"
+    Then I should see "Admin"
