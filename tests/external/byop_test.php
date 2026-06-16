@@ -63,9 +63,9 @@ final class byop_test extends \advanced_testcase {
     }
 
     /**
-     * Test init_device_flow returns structure.
+     * Test init_device_flow returns a result array.
      */
-    public function test_init_device_flow_returns_structure(): void {
+    public function test_init_device_flow_returns_array(): void {
         $this->setAdminUser();
         $result = byop::init_device_flow();
 
@@ -83,9 +83,9 @@ final class byop_test extends \advanced_testcase {
     }
 
     /**
-     * Test init_device_flow returns structure definition.
+     * Test init_device_flow_returns returns structure definition.
      */
-    public function test_init_device_flow_returns_structure(): void {
+    public function test_init_device_flow_returns_definition(): void {
         $returns = byop::init_device_flow_returns();
         $this->assertInstanceOf(\core_external\external_single_structure::class, $returns);
     }
