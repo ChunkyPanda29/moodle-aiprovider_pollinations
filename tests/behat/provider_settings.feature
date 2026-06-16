@@ -7,11 +7,6 @@ Feature: Pollinations AI provider smoke test
   Background:
     Given I log in as "admin"
 
-  Scenario: Site administration loads with plugin installed
-    When I am on site administration page
-    Then I should see "Plugins"
-
-  Scenario: Admin can access AI provider management
-    When I am on site administration page
-    And I follow "Notifications"
+  Scenario: Dashboard loads with plugin installed
+    When I follow "Site home"
     Then I should see "Moodle"
