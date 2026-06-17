@@ -1,0 +1,92 @@
+# Moodle Plugins Directory Auto-Release
+# When a tag matching v* is pushed, this workflow:
+# 1. Packages the plugin as a ZIP
+# 2. Creates a GitHub Release with the ZIP attached
+# 3. Calls the Moodle Plugins API to register the new version
+#
+# Based on: https://github.com/moodlehq/moodle-plugin-release
+# API docs: https://moodledev.io/general/community/plugincontribution/pluginsdirectory/api
+
+name: Release to Moodle Plugins Directory
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version info from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          # Convert v1.4.0 -> 2026061700 style version from version.php
+          VERSION=$(grep -oP "version\s*=\s*\K\d+" version.php | head -1)
+          RELEASE=$(grep -oP "release\s*=\s*'\K[^']+" version.php | head -1)
+          MATURITY=$(grep -oP "maturity\s*=\s*\K\d+" version.php | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "release=$RELEASE" >> $GITHUB_OUTPUT
+          echo "maturity=$MATURITY" >> $GITHUB_OUTPUT
+          echo "Detected: version=$VERSION release=$RELEASE maturity=$MATURITY"
+
+      - name: Package plugin ZIP
+        id: package
+        run: |
+          ZIPNAME="aiprovider_pollinations_moodle45_${{ steps.version.outputs.version }}.zip"
+          # Zip everything except .git, .github, tests artifacts
+          zip -r "$ZIPNAME" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "*.zip" \
+            -x "node_modules/*" \
+            -x ".gitignore" \
+            -x "screenshots/*"
+          echo "zipname=$ZIPNAME" >> $GITHUB_OUTPUT
+          ls -lh "$ZIPNAME"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.version.outputs.release }}
+          files: ${{ steps.package.outputs.zipname }}
+          generate_release_notes: true
+
+      - name: Get ZIP download URL
+        id: url
+        run: |
+          # Use the GitHub release asset download URL
+          REPO="${{ github.repository }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          ZIPNAME="${{ steps.package.outputs.zipname }}"
+          DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${TAG}/${ZIPNAME}"
+          echo "url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Download URL: $DOWNLOAD_URL"
+
+      - name: Register version with Moodle Plugins Directory
+        run: |
+          RESPONSE=$(curl -s "https://moodle.org/webservice/rest/server.php" \
+            --data-urlencode "wstoken=${{ secrets.MOODLE_ORG_TOKEN }}" \
+            --data-urlencode "wsfunction=local_plugins_add_version" \
+            --data-urlencode "moodlewsrestformat=json" \
+            --data-urlencode "frankenstyle=aiprovider_pollinations" \
+            --data-urlencode "zipurl=${{ steps.url.outputs.url }}" \
+            --data-urlencode "vcssystem=git" \
+            --data-urlencode "vcsrepositoryurl=https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations" \
+            --data-urlencode "vcsbranch=main" \
+            --data-urlencode "vcstag=${{ steps.version.outputs.tag }}")
+          echo "API Response: $RESPONSE"
+          echo "$RESPONSE" | jq .
+          # Check for errors
+          if echo "$RESPONSE" | jq -e '.exception' > /dev/null 2>&1; then
+            echo "::error::Moodle API returned an error"
+            exit 1
+          fi
