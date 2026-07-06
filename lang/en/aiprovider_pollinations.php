@@ -48,6 +48,7 @@ $string['byop_connect'] = 'Connect to Pollinations';
 $string['byop_connected'] = 'Connected as {$a}';
 $string['byop_disconnected'] = 'Not connected';
 $string['byop_heading'] = 'Pollinations Connection';
+$string['messageprovider:lowbalance'] = 'Low pollen balance notification';
 $string['byop_js_authfailed'] = 'Authorisation failed.';
 $string['byop_js_balance'] = ' — Balance: {$a} pollen';
 $string['byop_js_btn_connect'] = '🔗 Connect to Pollinations';
