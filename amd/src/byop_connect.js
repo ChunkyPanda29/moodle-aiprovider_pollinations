@@ -32,17 +32,75 @@
 
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
+import Str from 'core/str';
 
 const DEVICE_URL = 'https://enter.pollinations.ai/device';
 const POLL_INTERVAL = 5000; // 5 seconds between polls.
 const POLL_TIMEOUT = 300000; // 5 minutes total.
 
+/** @type {Object|null} Cached language strings. */
+let strings = null;
+
+/**
+ * Load all required language strings.
+ *
+ * @return {Promise<Object>}
+ */
+const loadStrings = async() => {
+    if (strings !== null) {
+        return strings;
+    }
+
+    const keys = [
+        {key: 'byop_js_btn_connect', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_btn_disconnect', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_starting', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_failed_start', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_enter_code', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_btn_open', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_timeout', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_connected', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_disconnected', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_connected_label', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_balance', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_not_connected', component: 'aiprovider_pollinations'},
+        {key: 'byop_js_authfailed', component: 'aiprovider_pollinations'},
+    ];
+
+    const results = await Str.get_strings(keys);
+
+    strings = {
+        btnConnect: results[0],
+        btnDisconnect: results[1],
+        starting: results[2],
+        failedStart: results[3],
+        enterCode: results[4],
+        btnOpen: results[5],
+        timeout: results[6],
+        connected: results[7],
+        disconnected: results[8],
+        connectedLabel: results[9],
+        balance: results[10],
+        notConnected: results[11],
+        authFailed: results[12],
+    };
+
+    return strings;
+};
+
 /**
  * Initialise the BYOP connect UI.
  */
-export const init = () => {
+export const init = async() => {
     const container = document.getElementById('aiprovider_pollinations_byop_container');
     if (!container) {
+        return;
+    }
+
+    try {
+        await loadStrings();
+    } catch (e) {
+        Notification.exception(e);
         return;
     }
 
@@ -57,7 +115,7 @@ export const init = () => {
     const connectBtn = document.createElement('button');
     connectBtn.type = 'button';
     connectBtn.className = 'btn btn-primary';
-    connectBtn.textContent = '🔗 Connect to Pollinations';
+    connectBtn.textContent = strings.btnConnect;
     connectBtn.style.marginRight = '8px';
     connectBtn.addEventListener('click', startDeviceFlow);
     container.appendChild(connectBtn);
@@ -65,7 +123,7 @@ export const init = () => {
     const disconnectBtn = document.createElement('button');
     disconnectBtn.type = 'button';
     disconnectBtn.className = 'btn btn-secondary';
-    disconnectBtn.textContent = 'Disconnect';
+    disconnectBtn.textContent = strings.btnDisconnect;
     disconnectBtn.style.display = 'none';
     disconnectBtn.addEventListener('click', doDisconnect);
     container.appendChild(disconnectBtn);
@@ -77,7 +135,7 @@ export const init = () => {
  * Start the BYOP device authorisation flow.
  */
 const startDeviceFlow = async() => {
-    showStatus('Starting authorisation...', 'info');
+    showStatus(strings.starting, 'info');
 
     const request = {
         methodname: 'aiprovider_pollinations_init_device_flow',
@@ -87,7 +145,7 @@ const startDeviceFlow = async() => {
     try {
         const result = await Ajax.call([request])[0];
         if (!result.success) {
-            showStatus('❌ ' + (result.error || 'Failed to start authorisation.'), 'error');
+            showStatus('❌ ' + (result.error || strings.failedStart), 'error');
             return;
         }
 
@@ -96,13 +154,13 @@ const startDeviceFlow = async() => {
         const codeHtml = `
             <div style="padding:15px;border:2px solid #8a2be2;border-radius:8px;text-align:center;margin:10px 0;">
                 <div style="font-size:0.85em;color:#666;margin-bottom:5px;">
-                    Go to enter.pollinations.ai/device and enter this code:
+                    ${strings.enterCode}
                 </div>
                 <div style="font-size:2em;font-weight:bold;letter-spacing:4px;color:#8a2be2;margin:10px 0;">
                     ${code}
                 </div>
                 <button type="button" class="btn btn-primary" onclick="window.open('${DEVICE_URL}', '_blank')">
-                    🌐 Open Pollinations
+                    ${strings.btnOpen}
                 </button>
             </div>
         `;
@@ -126,7 +184,7 @@ const startDeviceFlow = async() => {
  */
 const pollForToken = async(deviceCode, elapsed = 0) => {
     if (elapsed >= POLL_TIMEOUT) {
-        showStatus('⏰ Authorisation timed out. Please try again.', 'error');
+        showStatus(strings.timeout, 'error');
         return;
     }
 
@@ -141,7 +199,7 @@ const pollForToken = async(deviceCode, elapsed = 0) => {
         const result = await Ajax.call([request])[0];
 
         if (result.success) {
-            showStatus('✅ Successfully connected to Pollinations!', 'success');
+            showStatus(strings.connected, 'success');
             toggleButtons(true);
             checkStatus();
             return;
@@ -154,7 +212,7 @@ const pollForToken = async(deviceCode, elapsed = 0) => {
         }
 
         // Actual error (denied, expired, etc).
-        showStatus('❌ ' + (result.error || 'Authorisation failed.'), 'error');
+        showStatus('❌ ' + (result.error || strings.authFailed), 'error');
     } catch (e) {
         Notification.exception(e);
     }
@@ -170,7 +228,7 @@ const doDisconnect = async() => {
     };
     try {
         await Ajax.call([request])[0];
-        showStatus('Disconnected from Pollinations.', 'info');
+        showStatus(strings.disconnected, 'info');
         toggleButtons(false);
     } catch (e) {
         Notification.exception(e);
@@ -188,18 +246,19 @@ const checkStatus = async() => {
     try {
         const result = await Ajax.call([request])[0];
         if (result.connected) {
-            let msg = '✅ Connected to Pollinations';
+            let msg = strings.connectedLabel;
             if (result.balance !== undefined && result.balance !== null) {
-                msg += ` — Balance: ${result.balance} pollen`;
+                // The balance string has {$a} placeholder.
+                msg += strings.balance.replace('{$a}', result.balance);
             }
             showStatus(msg, 'success');
             toggleButtons(true);
         } else {
-            showStatus('⚪ Not connected. Click "Connect to Pollinations" to get started.', 'info');
+            showStatus(strings.notConnected, 'info');
             toggleButtons(false);
         }
     } catch (e) {
-        showStatus('⚪ Not connected. Click "Connect to Pollinations" to get started.', 'info');
+        showStatus(strings.notConnected, 'info');
     }
 };
 

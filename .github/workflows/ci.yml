@@ -44,7 +44,7 @@ jobs:
             database: pgsql
           # NOTE: Moodle 5.0+ changed provider method signatures to static.
           # A separate release branch (MOODLE_500_STABLE) will support 5.0+.
-          # See: https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations/issues
+          # See: https://github.com/ChunkyPanda29/moodle-aiprovider_pollinations/issues
 
     steps:
       - name: Check out repository code

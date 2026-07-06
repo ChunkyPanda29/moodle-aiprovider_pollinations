@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'aiprovider_pollinations';
-$plugin->release = '1.3.0';
-$plugin->version = 2026061600;
+$plugin->release = '1.4.0';
+$plugin->version = 2026062000;
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;

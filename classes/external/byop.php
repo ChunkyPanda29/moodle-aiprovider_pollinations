@@ -52,6 +52,11 @@ class byop extends external_api {
     public static function init_device_flow(): array {
         require_sesskey();
 
+        // This function modifies site configuration — require admin capability.
+        $context = \context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/site:config', $context);
+
         $request = new Request(
             method: 'POST',
             uri: 'https://enter.pollinations.ai/api/device/code',
@@ -124,6 +129,11 @@ class byop extends external_api {
      */
     public static function poll_device_token(string $devicecode): array {
         require_sesskey();
+
+        // This function writes the API key to site config — require admin capability.
+        $context = \context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/site:config', $context);
 
         $params = self::validate_parameters(self::poll_device_token_parameters(), [
             'devicecode' => $devicecode,
@@ -237,6 +247,11 @@ class byop extends external_api {
     public static function get_status(): array {
         require_sesskey();
 
+        // Status reading requires admin access — the API key and balance are sensitive.
+        $context = \context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/site:config', $context);
+
         $apikey = get_config('aiprovider_pollinations', 'apikey');
         $connected = !empty($apikey);
 
@@ -283,6 +298,11 @@ class byop extends external_api {
      */
     public static function disconnect(): array {
         require_sesskey();
+
+        // Disconnecting clears the API key — require admin capability.
+        $context = \context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/site:config', $context);
 
         set_config('apikey', '', 'aiprovider_pollinations');
 

@@ -80,7 +80,7 @@ jobs:
             --data-urlencode "frankenstyle=aiprovider_pollinations" \
             --data-urlencode "zipurl=${{ steps.url.outputs.url }}" \
             --data-urlencode "vcssystem=git" \
-            --data-urlencode "vcsrepositoryurl=https://github.com/ChunkyPanda29/moodle-aiprovider-pollinations" \
+            --data-urlencode "vcsrepositoryurl=https://github.com/ChunkyPanda29/moodle-aiprovider_pollinations" \
             --data-urlencode "vcsbranch=main" \
             --data-urlencode "vcstag=${{ steps.version.outputs.tag }}")
           echo "API Response: $RESPONSE"
